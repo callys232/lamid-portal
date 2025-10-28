@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Navbar from "@/component/navbar/navBar";
-import Footer from "@/component/Footer";
-import ModalWrapper from "@/component/modalWrapper";
 import { Inter, Playfair_Display } from "next/font/google";
+import LayoutWrapper from "./LayoutWrapper"; // 👈 new wrapper
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -34,12 +33,7 @@ export default function RootLayout({
       className={`${inter.variable} ${playfair.variable}`}
     >
       <body className="antialiased font-sans">
-        <div className="min-h-screen bg-white text-gray-900 dark:bg-[#0d0d0d] dark:text-white transition-colors duration-300">
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
-          <ModalWrapper />
-        </div>
+        <LayoutWrapper>{children}</LayoutWrapper>
       </body>
     </html>
   );

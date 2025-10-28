@@ -1,28 +1,33 @@
-import { FcGoogle } from "react-icons/fc";
+"use client";
+
 import Link from "next/link";
 
-const AccountDropdown = () => {
+export default function AccountDropdown() {
   return (
-    <div className="absolute top-full right-0 bg-black border-t-2 border-red-700 shadow-lg rounded-b-lg w-56 text-white animate-fadeIn">
-      <ul className="flex flex-col py-3">
+    <div className="absolute right-0 top-full mt-2 w-48 bg-white text-black rounded shadow-lg z-50">
+      <ul className="flex flex-col">
         <li>
-          <Link href="/signin" className="block px-4 py-2 hover:bg-red-700">
+          <Link
+            href="/signin"
+            className="block px-4 py-2 hover:bg-red-600 hover:text-white"
+          >
             Sign In
           </Link>
         </li>
         <li>
-          <Link href="/signup" className="block px-4 py-2 hover:bg-red-700">
+          <Link
+            href="/signup"
+            className="block px-4 py-2 hover:bg-red-600 hover:text-white"
+          >
             Sign Up
           </Link>
         </li>
-        <li className="text-center py-1 text-gray-400 text-sm italic">or</li>
-        <li className="flex justify-center items-center gap-2 py-2 hover:bg-red-700 cursor-pointer">
-          <FcGoogle size={20} />
-          <span>Continue with Google</span>
+        <li>
+          <button className="w-full text-left px-4 py-2 hover:bg-red-600 hover:text-white">
+            Continue with Google
+          </button>
         </li>
       </ul>
     </div>
   );
-};
-
-export default AccountDropdown;
+}
