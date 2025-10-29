@@ -15,7 +15,7 @@ const navItems = [
   { name: "HOME", href: "/" },
   { name: "SERVICES", href: "#", DropdownComponent: ServicesDropdown },
   { name: "PORTFOLIO", href: "#", DropdownComponent: PortfolioDropdown },
-  { name: "CONSULTING", href: "#", DropdownComponent: ConsultingDropdown },
+  { name: "CONSULTING", href: "/", DropdownComponent: ConsultingDropdown },
   { name: "TALENT CLUB", href: "/talent" },
   { name: "CONTACT US", href: "/contact" },
 ];
