@@ -1,20 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Inter, Playfair_Display } from "next/font/google";
 import LayoutWrapper from "./LayoutWrapper";
 import { Toaster } from "react-hot-toast";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-playfair",
-  display: "swap",
-});
+import { inter, playfair } from "../fonts"; // import local fonts
 
 export const metadata: Metadata = {
   title: "Lamid Consulting",
@@ -32,7 +20,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${inter.variable} ${playfair.variable}`}
     >
-      <body className="antialiased font-sans bg-[#0c0000] text-white  min-h-screen flex flex-col">
+      <body className="antialiased font-sans bg-[#0c0000] text-white min-h-screen flex flex-col">
         {/* LayoutWrapper handles navbar, footer, and main content */}
         <LayoutWrapper>{children}</LayoutWrapper>
 

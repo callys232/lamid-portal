@@ -1,58 +1,52 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import dbConnect from "@/lib/dbConnect";
+import Project from "@/app/models/Project";
 
-interface Project {
-  id: string;
-  title: string;
-  organization: string;
-  budget: string;
-  hourlyRate: string;
-  category: string;
-  tech: string;
-  location: string;
-  image: string;
-  rating: number;
-  description: string;
-  skills: string[];
-  timeline: string;
-  milestones: string[];
+export async function GET() {
+  try {
+    await dbConnect();
+    const projects = await Project.find().sort({ createdAt: -1 });
+
+    return NextResponse.json({
+      success: true,
+      data: projects,
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Server Error";
+
+    console.error("GET /projects error:", message);
+
+    return NextResponse.json({ success: false, message }, { status: 500 });
+  }
 }
 
-// Fake DB (replace with your MongoDB or Prisma fetch)
-const PROJECTS: Project[] = [
-  {
-    id: "p1",
-    title: "AI-Powered Strategy Dashboard",
-    organization: "Lamid Consulting",
-    budget: "$10,000 - $15,000",
-    hourlyRate: "$120/hr",
-    category: "Tech & Software",
-    tech: "React, Node.js, AI",
-    location: "Remote",
-    image: "/images/ai-dashboard.jpg",
-    rating: 5,
-    description:
-      "Build a robust AI-driven business analytics dashboard for internal decision-making. The platform should support real-time financial data ingestion, AI-based predictions, and dynamic visualization tools.",
-    skills: ["React", "Node.js", "Tailwind", "AI/ML", "Data Visualization"],
-    timeline: "8 weeks",
-    milestones: [
-      "Week 1-2: UI/UX Design",
-      "Week 3-4: Backend Development",
-      "Week 5-6: AI Integration",
-      "Week 7-8: Testing & Launch",
-    ],
-  },
-];
+export async function POST(req: NextRequest) {
+  try {
+    await dbConnect();
+    const body = await req.json();
 
-export async function GET(req: Request, context: { params: { id: string } }) {
-  const { id } = context.params;
-  const project = PROJECTS.find((p: Project) => p.id === id);
+    // Simple validation
+    if (!body?.title || !body?.category) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "title and category are required",
+        },
+        { status: 400 }
+      );
+    }
 
-  if (!project) {
-    return NextResponse.json(
-      { success: false, message: "Not found" },
-      { status: 404 }
-    );
+    const project = await Project.create(body);
+
+    return NextResponse.json({
+      success: true,
+      data: project,
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Server Error";
+
+    console.error("POST /projects error:", message);
+
+    return NextResponse.json({ success: false, message }, { status: 500 });
   }
-
-  return NextResponse.json({ success: true, data: project });
 }

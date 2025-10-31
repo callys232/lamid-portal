@@ -10,7 +10,8 @@ interface ProjectModalProps {
 }
 
 interface ProjectData {
-  id: string;
+  _id?: string; // ✅ DB id support
+  id?: string; // ✅ local id support
   title: string;
   organization: string;
   budget: string;
@@ -48,11 +49,19 @@ export default function ProjectModal({
           throw new Error(data.message || "Failed to fetch project");
         }
 
-        setProject(data.data);
+        // ✅ Normalize budget and hourlyRate as strings
+        const normalizedProject: ProjectData = {
+          ...data.data,
+          _id: data.data._id || data.data.id,
+          id: data.data.id || data.data._id,
+          budget: String(data.data.budget),
+          hourlyRate: String(data.data.hourlyRate),
+        };
+
+        setProject(normalizedProject);
       } catch (err: unknown) {
         console.error("Error loading project:", err);
 
-        // Check if it's a native JS Error object
         if (err instanceof Error) {
           setError(err.message);
         } else {

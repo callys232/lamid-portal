@@ -10,35 +10,35 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
-  const [isSaved, setIsSaved] = useState<boolean>(false);
+  const projectId: string | null = project._id ?? project.id ?? null;
+
+  // ✅ Initialize saved state without setState in effect
+  const [isSaved, setIsSaved] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    const saved = JSON.parse(localStorage.getItem("savedProjects") || "[]");
+    return saved.includes(projectId);
+  });
+
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  // Load saved projects once after mount (no sync setState in render)
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    // Defer setState to next tick to avoid synchronous React warning
-    const timeout = setTimeout(() => {
-      const saved = JSON.parse(localStorage.getItem("savedProjects") || "[]");
-      setIsSaved(saved.includes(project.id));
-    }, 0);
-
-    return () => clearTimeout(timeout);
-  }, [project.id]);
-
-  // Sync localStorage whenever `isSaved` changes
+  // ✅ Sync localStorage when `isSaved` changes
   useEffect(() => {
     if (typeof window === "undefined") return;
 
     const saved = JSON.parse(localStorage.getItem("savedProjects") || "[]");
     const updated = isSaved
-      ? Array.from(new Set([...saved, project.id]))
-      : saved.filter((id: string) => id !== project.id);
+      ? Array.from(new Set([...saved, projectId]))
+      : saved.filter((id: string) => id !== projectId);
 
     localStorage.setItem("savedProjects", JSON.stringify(updated));
-  }, [isSaved, project.id]);
+  }, [isSaved, projectId]);
 
   const toggleSave = () => setIsSaved((prev) => !prev);
+
+  // ✅ prevent undefined values
+  const rating = project.rating ?? 0;
+  const hourlyRate = project.hourlyRate ?? "N/A";
+  const image = project.image ?? "/placeholder-project.jpg";
 
   return (
     <>
@@ -49,7 +49,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           onClick={() => setShowModal(true)}
         >
           <Image
-            src={project.image}
+            src={image}
             alt={project.title}
             width={400}
             height={200}
@@ -66,19 +66,26 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             >
               {project.title}
             </h3>
+
             <div className="flex text-red-500 text-sm mt-1">
-              {"★".repeat(project.rating)}
+              {"★".repeat(rating)}
             </div>
+
             <p className="text-sm text-gray-400 mt-2">
               Category: {project.category}
             </p>
-            <p className="text-sm text-gray-400">
-              Organization: {project.organization}
-            </p>
+
+            {project.organization && (
+              <p className="text-sm text-gray-400">
+                Organization: {project.organization}
+              </p>
+            )}
+
             <p className="text-sm text-gray-300 mt-1">
               Budget: {project.budget}
             </p>
-            <p className="text-sm text-gray-300">Rate: {project.hourlyRate}</p>
+
+            <p className="text-sm text-gray-300">Rate: {hourlyRate}</p>
           </div>
 
           {/* Buttons */}
@@ -107,7 +114,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       {/* Modal */}
       {showModal && (
         <ProjectModal
-          projectId={project.id}
+          projectId={projectId}
           onClose={() => setShowModal(false)}
         />
       )}
