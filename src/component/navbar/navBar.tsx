@@ -135,6 +135,14 @@ export default function Navbar() {
                       Continue with Google
                     </button>
                   </li>
+                  <li>
+                    <Link
+                      href="/profile"
+                      className="block px-4 py-2 hover:bg-[#c12129] hover:text-white transition"
+                    >
+                      Sign In without password
+                    </Link>
+                  </li>
                 </ul>
               </div>
             )}
@@ -214,6 +222,12 @@ export default function Navbar() {
               className="block bg-black px-4 py-2 rounded-lg hover:bg-[#c12129] transition"
             >
               Sign Up
+            </Link>
+            <Link
+              href="/profile"
+              className="block bg-black px-4 py-2 rounded-lg hover:bg-[#c12129] transition"
+            >
+              Sign In without password
             </Link>
             <button className="w-full bg-[#c12129] text-white py-2 rounded-lg hover:bg-red-700 transition">
               Continue with Google

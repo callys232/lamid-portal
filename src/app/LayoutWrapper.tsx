@@ -17,10 +17,17 @@ export default function LayoutWrapper({
   const hideLayout = noLayoutRoutes.some((path) => pathname.startsWith(path));
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 dark:bg-[#0d0d0d] dark:text-white transition-colors duration-300">
+    <div className="min-h-screen w-screen bg-[#0c0000] text-white overflow-x-hidden flex flex-col transition-colors duration-300">
+      {/* Navbar */}
       {!hideLayout && <Navbar />}
-      <main>{children}</main>
+
+      {/* Main Content */}
+      <main className="flex-1 w-full overflow-y-auto">{children}</main>
+
+      {/* Footer */}
       {!hideLayout && <Footer />}
+
+      {/* Modal */}
       {!hideLayout && <ModalWrapper />}
     </div>
   );
