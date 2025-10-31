@@ -4,10 +4,12 @@ import Project from "@/app/models/Project";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   await dbConnect();
-  const project = await Project.findById(params.id);
+  const { id } = await context.params; // 👈 await here
+  const project = await Project.findById(id);
+
   if (!project) {
     return NextResponse.json(
       { success: false, message: "Project not found" },
@@ -19,11 +21,13 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   await dbConnect();
+  const { id } = await context.params;
   const body = await req.json();
-  const updated = await Project.findByIdAndUpdate(params.id, body, {
+
+  const updated = await Project.findByIdAndUpdate(id, body, {
     new: true,
     runValidators: true,
   });
@@ -38,10 +42,12 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   await dbConnect();
-  const deleted = await Project.findByIdAndDelete(params.id);
+  const { id } = await context.params;
+
+  const deleted = await Project.findByIdAndDelete(id);
   if (!deleted) {
     return NextResponse.json(
       { success: false, message: "Project not found" },

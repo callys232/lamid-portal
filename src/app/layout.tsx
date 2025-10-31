@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import LayoutWrapper from "./LayoutWrapper";
 import { Toaster } from "react-hot-toast";
-import { inter, playfair } from "../fonts"; // import local fonts
+import { inter, playfair } from "../fonts"; // now using next/font/google
 
 export const metadata: Metadata = {
   title: "Lamid Consulting",
@@ -21,10 +21,7 @@ export default function RootLayout({
       className={`${inter.variable} ${playfair.variable}`}
     >
       <body className="antialiased font-sans bg-[#0c0000] text-white min-h-screen flex flex-col">
-        {/* LayoutWrapper handles navbar, footer, and main content */}
         <LayoutWrapper>{children}</LayoutWrapper>
-
-        {/* Global Toasts */}
         <Toaster position="top-right" />
       </body>
     </html>
