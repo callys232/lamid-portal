@@ -1,28 +1,16 @@
 // src/fonts.ts
-import localFont from "next/font/local";
+import { Inter, Playfair_Display } from "next/font/google";
 
-export const inter = localFont({
-  src: [
-    { path: "/fonts/Inter-Medium.otf", weight: "400", style: "normal" },
-    { path: "/fonts/Inter-Black.otf", weight: "700", style: "normal" },
-  ],
+export const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "700"], // Medium and Black
   variable: "--font-inter",
   display: "swap",
 });
 
-export const playfair = localFont({
-  src: [
-    {
-      path: "/fonts/PlayfairDisplay-Regular.ttf",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "/fonts/PlayfairDisplay-Black.ttf",
-      weight: "700",
-      style: "normal",
-    },
-  ],
+export const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400", "700"], // Regular and Black
   variable: "--font-playfair",
   display: "swap",
 });

@@ -2,27 +2,121 @@
 
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import FilterSidebar, { FilterOption } from "./FilterSidebar";
+import { Search } from "lucide-react";
 import ConsultantCard from "./consultantCard";
 import ProjectCard from "../projects/projectCard";
 import { consultantsData, Consultant } from "./consultantData";
 import { projectsData, Project } from "../projects/projectData";
 
-// Default filters
+// Filters
 const defaultConsultantFilters = {
   search: "",
   industry: "All",
   rate: "All",
   rating: "All",
 };
+
 const defaultProjectFilters = {
   search: "",
   category: "All",
   tech: "All",
   location: "All",
 };
+
 type ConsultantFilters = typeof defaultConsultantFilters;
 type ProjectFilters = typeof defaultProjectFilters;
+
+// Filter option type
+export interface FilterOption<T extends { search: string }> {
+  label: string;
+  key: keyof T;
+  options: string[];
+  isRating?: boolean;
+}
+
+// Generic Filter Sidebar
+interface FilterSidebarProps<T extends { search: string }> {
+  activeTab: "consultants" | "projects";
+  filters: T;
+  setFilters: React.Dispatch<React.SetStateAction<T>>;
+  filterConfigs: FilterOption<T>[];
+  showClearButton: boolean;
+  handleClearFilters: () => void;
+}
+
+function FilterSidebar<T extends { search: string }>({
+  activeTab,
+  filters,
+  setFilters,
+  filterConfigs,
+  showClearButton,
+  handleClearFilters,
+}: FilterSidebarProps<T>) {
+  return (
+    <div className="bg-[#010101] border border-[#a71414] rounded-2xl p-5 shadow-lg space-y-6 relative overflow-hidden sticky top-6">
+      <h3 className="text-lg font-bold text-white mb-3">
+        {activeTab === "consultants" ? "Consultant Filters" : "Project Filters"}
+      </h3>
+
+      {/* Search */}
+      <div>
+        <label htmlFor="search" className="text-sm text-gray-400">
+          Search
+        </label>
+        <div className="relative mt-1">
+          <input
+            id="search"
+            type="text"
+            value={filters.search}
+            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+            placeholder={`Search ${activeTab}...`}
+            className="w-full bg-transparent border border-[#a71414] text-gray-100 placeholder-gray-500 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#d31c1c]"
+          />
+          <Search className="absolute right-3 top-2.5 text-gray-400 w-5 h-5" />
+        </div>
+      </div>
+
+      {/* Filters */}
+      {filterConfigs.map(({ label, key, options, isRating }) => (
+        <div key={String(key)}>
+          <label className="text-sm text-gray-400">{label}</label>
+          <select
+            aria-label="filter"
+            value={filters[key] as string}
+            onChange={(e) =>
+              setFilters({ ...filters, [key]: e.target.value } as T)
+            }
+            className="w-full bg-[#010101] border border-[#a71414] text-gray-100 px-3 py-2 rounded-md focus:outline-none"
+          >
+            {options.map((opt) => (
+              <option key={opt} value={opt}>
+                {isRating && opt !== "All"
+                  ? "★".repeat(Number(opt)) + "☆".repeat(5 - Number(opt))
+                  : opt}
+              </option>
+            ))}
+          </select>
+        </div>
+      ))}
+
+      {/* Clear Button */}
+      <AnimatePresence>
+        {showClearButton && (
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.25 }}
+            onClick={handleClearFilters}
+            className="w-full mt-5 font-semibold py-2 rounded-md bg-[#a71414]/80 hover:bg-[#d31c1c] text-white hover:scale-[1.02] focus:ring-2 focus:ring-[#d31c1c] transition-all"
+          >
+            Clear Filters ✨
+          </motion.button>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 export default function ConsultancyMatchingSection() {
   const [activeTab, setActiveTab] = useState<"consultants" | "projects">(
@@ -115,7 +209,6 @@ export default function ConsultancyMatchingSection() {
     });
   }, [projectFilters]);
 
-  // Clear filters for the active tab
   const handleClearFilters = () => {
     if (activeTab === "consultants")
       setConsultantFilters(defaultConsultantFilters);
@@ -151,13 +244,6 @@ export default function ConsultancyMatchingSection() {
     { label: "Location", key: "location", options: locations },
   ];
 
-  // Tab switch handler
-  const handleTabSwitch = (tab: "consultants" | "projects") => {
-    setActiveTab(tab);
-    if (tab === "consultants") setProjectFilters(defaultProjectFilters);
-    else setConsultantFilters(defaultConsultantFilters);
-  };
-
   return (
     <section className="w-screen min-h-screen bg-[#0c0000] text-white font-sans flex flex-col overflow-hidden">
       {/* Header + Tabs */}
@@ -169,7 +255,7 @@ export default function ConsultancyMatchingSection() {
           {["consultants", "projects"].map((tab) => (
             <button
               key={tab}
-              onClick={() => handleTabSwitch(tab as "consultants" | "projects")}
+              onClick={() => setActiveTab(tab as "consultants" | "projects")}
               className={`px-6 py-2 rounded-md font-semibold transition-all ${
                 activeTab === tab
                   ? "bg-red-600 text-white"
@@ -214,65 +300,29 @@ export default function ConsultancyMatchingSection() {
             {activeTab === "consultants" ? "Consultants" : "Projects"}
           </h3>
 
-          <AnimatePresence mode="wait">
-            {activeTab === "consultants" ? (
-              <motion.div
-                key="consultants"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.2 }}
-              >
-                {filteredConsultants.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 pb-6">
-                    {filteredConsultants.map((c) => (
-                      <motion.div
-                        key={c.id}
-                        layout
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                      >
-                        <ConsultantCard consultant={c} />
-                      </motion.div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center text-gray-400 mt-10">
-                    No consultants found matching your filters.
-                  </p>
-                )}
-              </motion.div>
+          {activeTab === "consultants" ? (
+            filteredConsultants.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 pb-6">
+                {filteredConsultants.map((c) => (
+                  <ConsultantCard key={c.id} consultant={c} />
+                ))}
+              </div>
             ) : (
-              <motion.div
-                key="projects"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
-              >
-                {filteredProjects.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 pb-6">
-                    {filteredProjects.map((p) => (
-                      <motion.div
-                        key={p.id}
-                        layout
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                      >
-                        <ProjectCard project={p} />
-                      </motion.div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center text-gray-400 mt-10">
-                    No projects found matching your search.
-                  </p>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
+              <p className="text-center text-gray-400 mt-10">
+                No consultants found matching your filters.
+              </p>
+            )
+          ) : filteredProjects.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 pb-6">
+              {filteredProjects.map((p) => (
+                <ProjectCard key={p.id} project={p} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-gray-400 mt-10">
+              No projects found matching your search.
+            </p>
+          )}
         </div>
       </div>
     </section>
