@@ -22,16 +22,7 @@ export const mockClient: ClientProfile = {
       organization: "TechCorp",
       image: "/images/projects/dashboard.png",
       consultants: [
-        {
-          id: "cons-001",
-          name: "Michael Smith",
-          industry: "Data Science",
-          delivery: "Agile Sprints",
-          rate: "$75",
-          rating: 5,
-          image: "/images/consultants/michael.png",
-          experience: 6,
-        },
+        { id: "cons-001", name: "Michael Smith" }, // ✅ trimmed
       ],
     },
     {
@@ -47,21 +38,34 @@ export const mockClient: ClientProfile = {
       organization: "FinServe Ltd",
       image: "/images/projects/mobilebank.png",
       consultants: [
-        {
-          id: "cons-002",
-          name: "Sarah Johnson",
-          industry: "Mobile Development",
-          delivery: "Milestone-Based",
-          rate: "$85",
-          rating: 4,
-          image: "/images/consultants/sarah.png",
-          experience: 4,
-        },
+        { id: "cons-002", name: "Sarah Johnson" }, // ✅ trimmed
       ],
     },
   ],
 
   consultants: [
+    {
+      id: "cons-001",
+      name: "Michael Smith",
+      industry: "Data Science",
+      delivery: "Agile Sprints",
+      rate: "$75",
+      rating: 5,
+      image: "/images/consultants/michael.png",
+      experience: 6,
+      role: "Lead Consultant",
+    },
+    {
+      id: "cons-002",
+      name: "Sarah Johnson",
+      industry: "Mobile Development",
+      delivery: "Milestone-Based",
+      rate: "$85",
+      rating: 4,
+      image: "/images/consultants/sarah.png",
+      experience: 4,
+      role: "Mobile Engineer",
+    },
     {
       id: "cons-003",
       name: "David Lee",
@@ -71,12 +75,14 @@ export const mockClient: ClientProfile = {
       rating: 5,
       image: "/images/consultants/david.png",
       experience: 8,
+      role: "Cloud Architect",
     },
   ],
 
   escrowTransactions: [
     {
       id: "escrow-001",
+      projectId: "proj-001", // ✅ required by type
       amount: 5000,
       currency: "USD",
       status: "funded",
@@ -85,6 +91,7 @@ export const mockClient: ClientProfile = {
     },
     {
       id: "escrow-002",
+      projectId: "proj-002", // ✅ required by type
       amount: 12000,
       currency: "USD",
       status: "pending",
@@ -98,6 +105,7 @@ export const mockClient: ClientProfile = {
       id: "invite-001",
       projectId: "proj-001",
       invitedBy: "admin@techcorp.com",
+      method: "email", // ✅ required by type
       status: "accepted",
       createdAt: "2025-09-20T08:00:00Z",
     },
@@ -105,6 +113,7 @@ export const mockClient: ClientProfile = {
       id: "invite-002",
       projectId: "proj-002",
       invitedBy: "hr@finserve.com",
+      method: "email", // ✅ required by type
       status: "pending",
       createdAt: "2025-10-05T14:00:00Z",
     },

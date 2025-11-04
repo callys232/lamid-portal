@@ -4,102 +4,83 @@ import Team from "@/app/models/Teams";
 import Project from "@/app/models/Project";
 import mongoose from "mongoose";
 
-// Route params interface
-interface RouteParams {
-  teamId: string;
+/** Utility: validate a Mongo ObjectId */
+function validateObjectId(id: string) {
+  return mongoose.Types.ObjectId.isValid(id);
+}
+
+/** Utility: standard error response */
+function errorResponse(message: string, status = 400) {
+  return NextResponse.json({ success: false, message }, { status });
 }
 
 // GET: fetch a single team and its projects
 export async function GET(
   req: NextRequest,
-  { params }: { params: RouteParams }
+  context: { params: Promise<{ teamId: string }> }
 ) {
   try {
     await dbConnect();
+    const { teamId } = await context.params;
 
-    const { teamId } = params;
-
-    if (!mongoose.Types.ObjectId.isValid(teamId)) {
-      return NextResponse.json(
-        { success: false, message: "Invalid Team ID" },
-        { status: 400 }
-      );
+    if (!validateObjectId(teamId)) {
+      return errorResponse("Invalid Team ID", 400);
     }
 
     const team = await Team.findById(teamId).lean();
-    if (!team)
-      return NextResponse.json(
-        { success: false, message: "Team not found" },
-        { status: 404 }
-      );
+    if (!team) return errorResponse("Team not found", 404);
 
     const projects = await Project.find({ team: teamId }).lean();
-
     return NextResponse.json({ success: true, data: { team, projects } });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Server error";
-    return NextResponse.json({ success: false, message }, { status: 500 });
+    return errorResponse(message, 500);
   }
 }
 
 // PUT: update a team by ID
 export async function PUT(
   req: NextRequest,
-  { params }: { params: RouteParams }
+  context: { params: Promise<{ teamId: string }> }
 ) {
   try {
     await dbConnect();
-    const { teamId } = params;
+    const { teamId } = await context.params;
 
-    if (!mongoose.Types.ObjectId.isValid(teamId)) {
-      return NextResponse.json(
-        { success: false, message: "Invalid Team ID" },
-        { status: 400 }
-      );
+    if (!validateObjectId(teamId)) {
+      return errorResponse("Invalid Team ID", 400);
     }
 
     const body = await req.json();
-
     const updatedTeam = await Team.findByIdAndUpdate(teamId, body, {
       new: true,
       runValidators: true,
     }).lean();
 
-    if (!updatedTeam)
-      return NextResponse.json(
-        { success: false, message: "Team not found" },
-        { status: 404 }
-      );
+    if (!updatedTeam) return errorResponse("Team not found", 404);
 
     return NextResponse.json({ success: true, data: updatedTeam });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Server error";
-    return NextResponse.json({ success: false, message }, { status: 500 });
+    return errorResponse(message, 500);
   }
 }
 
 // DELETE: remove a team by ID
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: RouteParams }
+  context: { params: Promise<{ teamId: string }> }
 ) {
   try {
     await dbConnect();
-    const { teamId } = params;
+    const { teamId } = await context.params;
 
-    if (!mongoose.Types.ObjectId.isValid(teamId)) {
-      return NextResponse.json(
-        { success: false, message: "Invalid Team ID" },
-        { status: 400 }
-      );
+    if (!validateObjectId(teamId)) {
+      return errorResponse("Invalid Team ID", 400);
     }
 
     const deletedTeam = await Team.findByIdAndDelete(teamId).lean();
-    if (!deletedTeam)
-      return NextResponse.json(
-        { success: false, message: "Team not found" },
-        { status: 404 }
-      );
+    if (!deletedTeam) return errorResponse("Team not found", 404);
 
     // Optional: also delete projects of this team
     await Project.deleteMany({ team: teamId });
@@ -110,6 +91,6 @@ export async function DELETE(
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Server error";
-    return NextResponse.json({ success: false, message }, { status: 500 });
+    return errorResponse(message, 500);
   }
 }

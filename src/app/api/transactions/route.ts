@@ -1,39 +1,26 @@
-import express, { Request, Response } from "express";
-import Transaction from "../../models/Transactions";
-
-const router = express.Router();
+import { NextRequest, NextResponse } from "next/server";
+import dbConnect from "@/lib/dbConnect";
+import Transaction from "@/app/models/Transactions";
 
 // GET all transactions
-router.get("/", async (req: Request, res: Response) => {
+export async function GET() {
+  await dbConnect();
   const transactions = await Transaction.find();
-  res.json(transactions);
-});
-
-// GET transaction by ID
-router.get("/:id", async (req: Request, res: Response) => {
-  const transaction = await Transaction.findById(req.params.id);
-  res.json(transaction);
-});
+  return NextResponse.json({ success: true, data: transactions });
+}
 
 // POST new transaction
-router.post("/", async (req: Request, res: Response) => {
-  const newTransaction = new Transaction(req.body);
-  await newTransaction.save();
-  res.status(201).json(newTransaction);
-});
-
-// PUT update transaction
-router.put("/:id", async (req: Request, res: Response) => {
-  const updated = await Transaction.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-  });
-  res.json(updated);
-});
-
-// DELETE transaction
-router.delete("/:id", async (req: Request, res: Response) => {
-  await Transaction.findByIdAndDelete(req.params.id);
-  res.status(204).send();
-});
-
-export default router;
+export async function POST(req: NextRequest) {
+  try {
+    await dbConnect();
+    const body = await req.json();
+    const newTransaction = await Transaction.create(body);
+    return NextResponse.json(
+      { success: true, data: newTransaction },
+      { status: 201 }
+    );
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ success: false, message }, { status: 400 });
+  }
+}
