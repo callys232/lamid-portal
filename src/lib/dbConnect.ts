@@ -3,7 +3,7 @@ import mongoose, { Mongoose } from "mongoose";
 const MONGODB_URI = process.env.MONGODB_URI as string;
 
 if (!MONGODB_URI) {
-  throw new Error("Please add MONGODB_URI to your .env.local");
+  console.error("❌ MONGODB_URI is not defined in your environment variables.");
 }
 
 interface MongooseCache {
@@ -11,23 +11,37 @@ interface MongooseCache {
   promise: Promise<Mongoose> | null;
 }
 
+// Augment the NodeJS global type so we can safely attach our cache
 declare global {
   // eslint-disable-next-line no-var
   var mongooseCache: MongooseCache | undefined;
 }
 
-const globalCache = global.mongooseCache || { conn: null, promise: null };
-global.mongooseCache = globalCache; // ensure it's stored globally
+let cached = global.mongooseCache;
 
-export default async function dbConnect() {
-  if (globalCache.conn) return globalCache.conn;
+if (!cached) {
+  cached = { conn: null, promise: null };
+  global.mongooseCache = cached;
+}
 
-  if (!globalCache.promise) {
-    globalCache.promise = mongoose
-      .connect(MONGODB_URI)
-      .then((mongoose) => mongoose);
+async function dbConnect(): Promise<Mongoose> {
+  if (cached!.conn) {
+    return cached!.conn;
   }
 
-  globalCache.conn = await globalCache.promise;
-  return globalCache.conn;
+  if (!cached!.promise) {
+    if (!MONGODB_URI) {
+      throw new Error("Database connection failed: MONGODB_URI is missing.");
+    }
+
+    cached!.promise = mongoose.connect(MONGODB_URI).then((mongooseInstance) => {
+      console.log("✅ Connected to MongoDB");
+      return mongooseInstance;
+    });
+  }
+
+  cached!.conn = await cached!.promise;
+  return cached!.conn;
 }
+
+export default dbConnect;
