@@ -11,7 +11,7 @@ export interface ProjectOverviewProps {
   category: string;
   rating: number;
   image: string;
-  budget: string;
+  budget: number | string;
   hourlyRate: string;
   tech: string;
   timeline: string;

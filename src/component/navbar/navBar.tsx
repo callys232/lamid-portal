@@ -13,9 +13,17 @@ import ConsultingDropdown from "./ConsultingDropdown";
 
 const navItems = [
   { name: "HOME", href: "/" },
-  { name: "SERVICES", href: "#", DropdownComponent: ServicesDropdown },
-  { name: "PORTFOLIO", href: "#", DropdownComponent: PortfolioDropdown },
-  { name: "CONSULTING", href: "/", DropdownComponent: ConsultingDropdown },
+  { name: "SERVICES", href: "/services", DropdownComponent: ServicesDropdown },
+  {
+    name: "PORTFOLIO",
+    href: "/portfolio",
+    DropdownComponent: PortfolioDropdown,
+  },
+  {
+    name: "CONSULTING",
+    href: "/consulting",
+    DropdownComponent: ConsultingDropdown,
+  },
   { name: "TALENT CLUB", href: "/talent" },
   { name: "CONTACT US", href: "/contact" },
 ];
@@ -25,14 +33,10 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const closeTimeout = useRef<NodeJS.Timeout | null>(null);
   const [openMobileDropdown, setOpenMobileDropdown] = useState<string | null>(
     null
   );
-
-  const toggleMobileDropdown = (name: string) => {
-    setOpenMobileDropdown((prev) => (prev === name ? null : name));
-  };
+  const closeTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -49,10 +53,11 @@ export default function Navbar() {
     closeTimeout.current = setTimeout(() => setOpenDropdown(null), 150);
   };
 
-  const isActive = (href: string) => {
-    if (href === "/") return pathname === "/";
-    return pathname.startsWith(href);
+  const toggleMobileDropdown = (name: string) => {
+    setOpenMobileDropdown((prev) => (prev === name ? null : name));
   };
+
+  const isActive = (href: string) => pathname === href;
 
   return (
     <nav
@@ -62,9 +67,10 @@ export default function Navbar() {
           : "bg-transparent py-4"
       }`}
     >
+      {/* Top Row */}
       <div className="flex items-center justify-between px-6 max-w-7xl mx-auto">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" aria-label="Home">
           <Image
             src="/Logo.png"
             alt="Lamid Consulting"
@@ -75,7 +81,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Navigation */}
-        <ul className="hidden md:flex items-center gap-8 text-white font-sans font-medium">
+        <ul className="hidden md:flex items-center gap-8 text-white font-medium">
           {navItems.map((item) => (
             <li
               key={item.name}
@@ -85,39 +91,42 @@ export default function Navbar() {
             >
               <Link
                 href={item.href}
-                className={`transition-colors font-serif tracking-wide ${
+                className={`transition font-serif ${
                   isActive(item.href)
                     ? "text-[#c12129]"
-                    : "hover:text-[#c12129] text-white"
+                    : "hover:text-[#c12129]"
                 }`}
               >
                 {item.name}
               </Link>
 
+              {/* Desktop dropdown */}
               {item.DropdownComponent && openDropdown === item.name && (
                 <item.DropdownComponent isOpen />
               )}
             </li>
           ))}
 
-          {/* Account Dropdown */}
+          {/* Desktop Account */}
           <li
             className="relative"
             onMouseEnter={() => handleMouseEnter("ACCOUNT")}
             onMouseLeave={handleMouseLeave}
           >
-            <button className="flex items-center gap-2 bg-black px-4 py-2 rounded-lg hover:bg-[#c12129] transition text-white font-sans">
-              <span className="text-lg">👤</span>
-              <span className="font-serif">Account</span>
+            <button
+              aria-label="Account menu"
+              className="flex items-center gap-2 bg-black px-4 py-2 rounded-lg hover:bg-[#c12129] transition text-white"
+            >
+              👤 <span className="font-serif">Account</span>
             </button>
 
             {openDropdown === "ACCOUNT" && (
-              <div className="absolute right-0 top-full mt-3 w-56 bg-white text-black rounded-lg shadow-xl z-30 overflow-hidden font-sans">
+              <div className="absolute right-0 top-full mt-3 w-56 bg-white text-black rounded-lg shadow-xl z-30">
                 <ul className="flex flex-col">
                   <li>
                     <Link
                       href="/signin"
-                      className="block px-4 py-2 hover:bg-[#c12129] hover:text-white transition"
+                      className="block px-4 py-2 hover:bg-[#c12129] hover:text-white"
                     >
                       Sign In
                     </Link>
@@ -125,30 +134,30 @@ export default function Navbar() {
                   <li>
                     <Link
                       href="/signup"
-                      className="block px-4 py-2 hover:bg-[#c12129] hover:text-white transition"
+                      className="block px-4 py-2 hover:bg-[#c12129] hover:text-white"
                     >
                       Sign Up
                     </Link>
                   </li>
                   <li>
-                    <button className="w-full text-left px-4 py-2 hover:bg-[#c12129] hover:text-white transition">
+                    <button className="px-4 py-2 w-full text-left hover:bg-[#c12129] hover:text-white">
                       Continue with Google
                     </button>
                   </li>
                   <li>
                     <Link
                       href="/profile"
-                      className="block px-4 py-2 hover:bg-[#c12129] hover:text-white transition"
+                      className="block px-4 py-2 hover:bg-[#c12129] hover:text-white"
                     >
-                      consultant Sign In without password
+                      Consultant Login
                     </Link>
                   </li>
                   <li>
                     <Link
                       href="/client"
-                      className="block px-4 py-2 hover:bg-[#c12129] hover:text-white transition"
+                      className="block px-4 py-2 hover:bg-[#c12129] hover:text-white"
                     >
-                      client Sign In without password
+                      Client Login
                     </Link>
                   </li>
                 </ul>
@@ -157,8 +166,9 @@ export default function Navbar() {
           </li>
         </ul>
 
-        {/* Mobile Menu Toggle */}
+        {/* Mobile Menu Button */}
         <button
+          aria-label="Toggle mobile menu"
           className="md:hidden text-3xl text-white hover:text-[#c12129] transition"
           onClick={() => setMobileOpen((prev) => !prev)}
         >
@@ -166,96 +176,97 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* ✅ Mobile Menu */}
       <div
-        className={`md:hidden bg-[#0b0b0b] border-t border-[#2a2a2a] overflow-hidden transition-all duration-300 ${
-          mobileOpen ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
+        className={`md:hidden bg-[#0b0b0b] border-t border-[#2a2a2a] transition-all duration-300 ${
+          mobileOpen
+            ? "max-h-[800px] opacity-100"
+            : "max-h-0 opacity-0 overflow-hidden"
         }`}
       >
-        <div className="px-6 py-4 space-y-4 text-white font-sans font-medium">
-          {navItems.map((item) => (
-            <div key={item.name}>
-              <button
-                onClick={() =>
-                  item.DropdownComponent && toggleMobileDropdown(item.name)
-                }
-                className={`w-full text-left text-lg mb-2 flex justify-between items-center font-serif tracking-wide ${
-                  isActive(item.href) ? "text-[#c12129]" : ""
-                }`}
-              >
-                {item.name}
-                {item.DropdownComponent && (
-                  <span
-                    className={`transition-transform ${
-                      openMobileDropdown === item.name ? "rotate-180" : ""
+        <div className="px-6 py-4 space-y-4 text-white font-medium">
+          {navItems.map((item) => {
+            const hasDropdown = !!item.DropdownComponent;
+            return (
+              <div key={item.name}>
+                <div className="flex justify-between items-center">
+                  {hasDropdown ? (
+                    <button
+                      className="text-lg w-full text-left font-serif flex justify-between items-center"
+                      onClick={() => toggleMobileDropdown(item.name)}
+                      aria-label={`${item.name} menu`}
+                    >
+                      {item.name}
+                      <span
+                        className={`transition-transform ${
+                          openMobileDropdown === item.name ? "rotate-180" : ""
+                        }`}
+                      >
+                        ▼
+                      </span>
+                    </button>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      onClick={() => setMobileOpen(false)}
+                      className="text-lg font-serif block"
+                    >
+                      {item.name}
+                    </Link>
+                  )}
+                </div>
+
+                {hasDropdown && (
+                  <div
+                    className={`ml-4 overflow-hidden transition-all ${
+                      openMobileDropdown === item.name ? "max-h-40" : "max-h-0"
                     }`}
                   >
-                    ▼
-                  </span>
+                    <item.DropdownComponent
+                      mobile
+                      isOpen={openMobileDropdown === item.name}
+                    />
+                  </div>
                 )}
-              </button>
+              </div>
+            );
+          })}
 
-              {item.DropdownComponent ? (
-                <div className="ml-4">
-                  <item.DropdownComponent
-                    mobile
-                    isOpen={openMobileDropdown === item.name}
-                  />
-                </div>
-              ) : (
-                <Link
-                  href={item.href}
-                  className={`block ml-2 transition ${
-                    isActive(item.href)
-                      ? "text-[#c12129]"
-                      : "text-gray-300 hover:text-[#c12129]"
-                  }`}
-                >
-                  Visit
-                </Link>
-              )}
-            </div>
-          ))}
-
-          {/* Account options */}
-          <div className="space-y-2 pt-2 border-t border-[#1a1a1a] font-sans">
+          {/* Account Section */}
+          <div className="pt-2 border-t border-[#1a1a1a] space-y-2">
             <Link
               href="/signin"
-              className="block bg-black px-4 py-2 rounded-lg hover:bg-[#c12129] transition"
+              className="block bg-black px-4 py-2 rounded-lg hover:bg-[#c12129]"
             >
               Sign In
             </Link>
             <Link
               href="/signup"
-              className="block bg-black px-4 py-2 rounded-lg hover:bg-[#c12129] transition"
+              className="block bg-black px-4 py-2 rounded-lg hover:bg-[#c12129]"
             >
               Sign Up
             </Link>
             <Link
               href="/profile"
-              className="block bg-black px-4 py-2 rounded-lg hover:bg-[#c12129] transition"
+              className="block bg-black px-4 py-2 rounded-lg hover:bg-[#c12129]"
             >
-              consultant Sign In without password
+              Consultant Login
             </Link>
             <Link
               href="/client"
-              className="block bg-black px-4 py-2 rounded-lg hover:bg-[#c12129] transition"
+              className="block bg-black px-4 py-2 rounded-lg hover:bg-[#c12129]"
             >
-              client Sign In without password
+              Client Login
             </Link>
-            <button className="w-full bg-[#c12129] text-white py-2 rounded-lg hover:bg-red-700 transition">
+            <button className="w-full bg-[#c12129] py-2 rounded-lg hover:bg-red-700">
               Continue with Google
             </button>
           </div>
         </div>
       </div>
 
-      {/* Sliding red accent line */}
-      <div
-        className={`absolute bottom-0 left-0 h-[2px] bg-[#c12129] transition-all duration-500 ease-out ${
-          scrolled ? "w-full" : "w-0"
-        }`}
-      />
+      {/* 🔴 Red Theme Line */}
+      <div className="h-[3px] w-full bg-gradient-to-r from-[#c12129] via-red-600 to-[#c12129]" />
     </nav>
   );
 }

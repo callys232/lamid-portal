@@ -17,16 +17,26 @@ import { Project } from "@/types/project";
 export default function ClientProfileDashboard() {
   const [activeTab, setActiveTab] = useState<string>("overview");
   const [client, setClient] = useState<ClientProfile | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchClient = async () => {
       try {
+        // Replace with a real MongoDB ObjectId from your database
+        const clientId = "654321abcdef1234567890";
         const res = await axios.get<{ success: boolean; data: ClientProfile }>(
-          "/api/clients/c1"
+          `/api/clients/${clientId}`
         );
-        if (res.data.success) setClient(res.data.data);
+
+        console.log("API response:", res.data);
+
+        if (res.data.success) {
+          setClient(res.data.data);
+        }
       } catch (err) {
         console.error("Error fetching client data:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -51,7 +61,8 @@ export default function ClientProfileDashboard() {
   };
 
   const renderTab = () => {
-    if (!client) return <p>Loading client profile...</p>;
+    if (loading) return <p>Loading client profile...</p>;
+    if (!client) return <p>No client data found.</p>;
 
     switch (activeTab) {
       case "overview":
@@ -86,22 +97,23 @@ export default function ClientProfileDashboard() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-950 text-white font-sans">
-      <ProfileHeader
-        client={client}
-        projectStats={{
-          total: client?.projects.length || 0,
-          completed:
-            client?.projects.filter((p) => p.status === "completed").length ||
-            0,
-          new: client?.projects.filter((p) => p.status === "new").length || 0,
-          suspended:
-            client?.projects.filter((p) => p.status === "suspended").length ||
-            0,
-          ongoing:
-            client?.projects.filter((p) => p.status === "ongoing").length || 0,
-        }}
-        categories={client?.projects.map((p) => p.category) || []}
-      />
+      {client && (
+        <ProfileHeader
+          client={client}
+          projectStats={{
+            total: client.projects.length,
+            completed: client.projects.filter((p) => p.status === "completed")
+              .length,
+            new: client.projects.filter((p) => p.status === "new").length,
+            suspended: client.projects.filter((p) => p.status === "suspended")
+              .length,
+            ongoing: client.projects.filter((p) => p.status === "ongoing")
+              .length,
+          }}
+          categories={client.projects.map((p) => p.category)}
+        />
+      )}
+
       <div className="flex flex-col md:flex-row flex-1">
         <div className="w-full md:w-64 border-b md:border-b-0 md:border-r border-gray-800">
           <ProfileSidebar activeTab={activeTab} setActiveTab={setActiveTab} />

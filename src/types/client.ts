@@ -1,7 +1,7 @@
 // types/client.ts
-
 import { Project, Milestone } from "./project";
 
+/* -------------------- CONSULTANTS -------------------- */
 export interface Consultant {
   id: string;
   name: string;
@@ -14,6 +14,7 @@ export interface Consultant {
   role: string;
 }
 
+/* -------------------- ESCROW TRANSACTIONS -------------------- */
 export interface EscrowTransaction {
   id: string;
   projectId: string;
@@ -29,51 +30,86 @@ export interface EscrowTransaction {
   createdAt: string;
   updatedAt: string;
 
-  // Optional UI fields
   releaseDate?: string;
   notes?: string;
-
-  // Single milestone trigger (for release actions)
   milestoneId?: string;
-
-  // Multiple milestone objects for UI / table / project page
   milestones?: Milestone[];
 }
 
+/* -------------------- INVITATIONS -------------------- */
 export interface Invitation {
   id: string;
-
-  // Who sent the invitation (client ID, system, or AI)
   invitedBy?: string;
-
-  // Project-specific if applicable
   projectId?: string;
-
-  // Email or consultant-based invitation
   email?: string;
   consultantId?: string;
 
-  // How the invite was sent
   method: "email" | "consultant" | "ai";
-
-  // Status
   status: "pending" | "accepted" | "declined";
 
   createdAt: string;
 }
 
+/* -------------------- TEAM MEMBERS -------------------- */
+export interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  email: string;
+  addedAt: string;
+}
+
+/* -------------------- AI AGENT LOGS -------------------- */
+export interface AiActionLog {
+  id: string;
+  actionType:
+    | "onboarding"
+    | "project-scoping"
+    | "matching"
+    | "notification"
+    | "marketing"
+    | "support";
+  message: string;
+  createdAt: string;
+
+  // optional reference
+  relatedProjectId?: string;
+  relatedConsultantId?: string;
+}
+
+/* -------------------- AI PREFERENCES -------------------- */
+export interface AiPreferences {
+  tone?: "formal" | "neutral" | "friendly" | "technical";
+  automationLevel?: "manual" | "assist" | "auto";
+  onboardingCompleted?: boolean;
+  industryKeywords?: string[];
+  aiAssistantEnabled?: boolean;
+}
+
+/* -------------------- BUSINESS PROFILE -------------------- */
+export interface BusinessProfile {
+  companyName?: string;
+  industry?: string;
+  location?: string;
+  size?: "1-10" | "11-50" | "51-200" | "200+";
+  website?: string;
+}
+
+/* -------------------- CLIENT PROFILE (MASTER) -------------------- */
 export interface ClientProfile {
   id: string;
   name: string;
   email: string;
-  companyName?: string;
-  industry?: string;
-  location?: string;
+
+  business?: BusinessProfile;
+  ai?: AiPreferences;
 
   projects: Project[];
   consultants: Consultant[];
   escrowTransactions: EscrowTransaction[];
   invitations: Invitation[];
+  teamMembers?: TeamMember[];
+  aiLogs?: AiActionLog[];
 
   createdAt: string;
   updatedAt: string;

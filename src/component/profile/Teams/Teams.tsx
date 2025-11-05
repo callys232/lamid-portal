@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { MilestoneItem } from "./MilestoneItem";
+import { PaymentItem } from "./PaymentItem";
+import { MemberItem } from "./Member";
+import { AlertItem } from "./Alert";
 
 interface TeamMember {
   id: number;
@@ -199,17 +203,36 @@ export default function Teams() {
       <aside className="w-full md:w-64 bg-gray-900 border border-gray-800 rounded-md p-4">
         <h3 className="text-lg font-medium mb-4">Alerts</h3>
         <ul className="space-y-2">
-          {activeProject.alerts.map((alert) => (
-            <li
-              key={alert.id}
-              className={`px-3 py-2 rounded-md ${alertStyle(alert.type)}`}
-            >
-              {alert.message}
-            </li>
+          {activeProject.milestones.map((ms) => (
+            <MilestoneItem
+              key={ms.id}
+              title={ms.title}
+              accomplished={ms.accomplished}
+            />
           ))}
-          {activeProject.alerts.length === 0 && (
-            <li className="text-sm text-gray-400">No alerts</li>
-          )}
+        </ul>
+
+        <ul className="space-y-2">
+          {activeProject.payments.map((p) => (
+            <PaymentItem
+              key={p.id}
+              label={p.label}
+              status={p.status}
+              amount={p.amount}
+            />
+          ))}
+        </ul>
+
+        <ul className="space-y-2">
+          {activeProject.members.map((m) => (
+            <MemberItem key={m.id} name={m.name} role={m.role} />
+          ))}
+        </ul>
+
+        <ul className="space-y-2">
+          {activeProject.alerts.map((a) => (
+            <AlertItem key={a.id} message={a.message} type={a.type} />
+          ))}
         </ul>
       </aside>
     </div>
