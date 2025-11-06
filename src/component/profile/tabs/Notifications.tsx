@@ -56,13 +56,13 @@ export default function Notifications() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
       {/* RECENT ACTIVITIES */}
-      <section className="bg-gray-900 border border-gray-800 rounded-md p-4">
+      <section className="bg-gray-900 border border-gray-800 rounded-md p-4 ring-1 ring-blue-500/40 hover:ring-blue-500 transition">
         <h2 className="text-xl font-semibold mb-4">Recent Activities</h2>
         <ul className="space-y-3">
           {activities.map((a) => (
             <li
               key={a.id}
-              className="flex justify-between bg-gray-800 px-3 py-2 rounded-md"
+              className="flex justify-between bg-gray-800 px-3 py-2 rounded-md hover:ring-1 hover:ring-blue-400 transition"
             >
               <span>{a.label}</span>
               <span className="text-gray-400">{a.value}</span>
@@ -72,13 +72,13 @@ export default function Notifications() {
       </section>
 
       {/* MESSAGES */}
-      <section className="bg-gray-900 border border-gray-800 rounded-md p-4">
+      <section className="bg-gray-900 border border-gray-800 rounded-md p-4 ring-1 ring-purple-500/40 hover:ring-purple-500 transition">
         <h2 className="text-xl font-semibold mb-4">Messages</h2>
         <ul className="space-y-3">
           {messages.map((m) => (
             <li
               key={m.id}
-              className="flex justify-between bg-gray-800 px-3 py-2 rounded-md"
+              className="flex justify-between bg-gray-800 px-3 py-2 rounded-md hover:ring-1 hover:ring-purple-400 transition"
             >
               <span>{m.label}</span>
               <span className="text-blue-400">{m.count}</span>
@@ -88,13 +88,13 @@ export default function Notifications() {
       </section>
 
       {/* ALERTS */}
-      <section className="bg-gray-900 border border-gray-800 rounded-md p-4">
+      <section className="bg-gray-900 border border-gray-800 rounded-md p-4 ring-1 ring-yellow-500/40 hover:ring-yellow-500 transition">
         <h2 className="text-xl font-semibold mb-4">Alerts</h2>
         <ul className="space-y-3">
           {alerts.map((al) => (
             <li
               key={al.id}
-              className="flex justify-between bg-gray-800 px-3 py-2 rounded-md"
+              className="flex justify-between bg-gray-800 px-3 py-2 rounded-md hover:ring-1 hover:ring-yellow-400 transition"
             >
               <span>{al.label}</span>
               <span

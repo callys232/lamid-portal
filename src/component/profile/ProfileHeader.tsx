@@ -1,22 +1,45 @@
+"use client";
+
 import { FaLinkedin, FaGithub, FaTwitter, FaCheckCircle } from "react-icons/fa";
+import { motion } from "framer-motion";
 import StatCard from "./statCard";
 
 export default function ProfileHeader() {
   return (
-    <div className="relative bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-b border-gray-700 p-8 rounded-lg shadow-lg overflow-hidden">
+    <motion.div
+      className="relative bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 
+             border-b border-gray-700 p-8 rounded-lg shadow-lg overflow-hidden 
+             ring-1 ring-gray-700 hover:ring-red-500 transition"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+    >
       {/* Premium Ribbon */}
-      <div className="absolute top-4 left-0 bg-red-600 text-white text-xs font-semibold px-4 py-1 rounded-r-lg shadow-md">
+      <motion.div
+        className="absolute top-4 left-0 bg-red-600 text-white text-xs font-semibold 
+               px-4 py-1 rounded-r-lg shadow-md animate-pulse"
+        initial={{ x: -50, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ delay: 0.3 }}
+      >
         Premium Member
-      </div>
+      </motion.div>
 
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
         {/* Avatar + Info */}
-        <div className="flex items-center gap-5">
+        <motion.div
+          className="flex items-center gap-5"
+          initial={{ x: -40, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
           <div className="relative">
+            <div className="absolute inset-0 rounded-full ring-2 ring-red-500 animate-pulse" />
             <img
               src="/avatar.png"
               alt="User Avatar"
-              className="w-20 h-20 rounded-full border-4 border-red-500 shadow-md"
+              className="w-20 h-20 rounded-full border-4 border-red-500 shadow-md 
+                     transform hover:scale-105 transition relative z-10"
             />
           </div>
           <div>
@@ -30,69 +53,126 @@ export default function ProfileHeader() {
             <p className="text-gray-400 text-sm">Full Stack Developer</p>
             <p className="text-xs text-gray-500 mt-1">Lagos, Nigeria</p>
           </div>
-        </div>
+        </motion.div>
 
         {/* Profile Completion */}
-        <div className="w-full md:w-1/3">
+        <motion.div
+          className="w-full md:w-1/3"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
           <div className="flex justify-between text-xs text-gray-400 mb-2">
             <span>Profile Completion</span>
             <span className="font-medium text-white">70%</span>
           </div>
-          <div className="w-full bg-gray-700 rounded-full h-2">
+          <div
+            role="progressbar"
+            aria-label="Profile completion"
+            aria-valuenow="70" // string
+            aria-valuemin="0"
+            aria-valuemax="100"
+            className="w-full bg-gray-700 rounded-full h-2"
+          >
+            <div
+              className="bg-red-500 h-2 rounded-full transition-all duration-500"
+              style={{ width: "70%" }}
+            />
+
             <div
               className="bg-red-500 h-2 rounded-full transition-all duration-500"
               style={{ width: "70%" }}
             />
           </div>
-        </div>
-
-        {/* Stats Section */}
-        {/* Stats Section */}
-        <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCard
-            value={24}
-            label="Projects"
-            details={["Project A", "Project B", "Project C"]}
-          />
-          <StatCard
-            value={18}
-            label="Completed"
-            details={["Completed A", "Completed B", "Completed C"]}
-          />
-          <StatCard
-            value="4.9"
-            label="Avg. Rating"
-            details={["Review 1: ⭐⭐⭐⭐⭐", "Review 2: ⭐⭐⭐⭐"]}
-          />
-          <StatCard
-            value="3 yrs"
-            label="Experience"
-            details={["React", "Node.js", "MongoDB"]}
-          />
-        </div>
-        {/* ... CTA Buttons + Social Links ... */}
+        </motion.div>
       </div>
+
+      {/* Stats Section */}
+      <motion.div
+        className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4"
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: {},
+          visible: {
+            transition: { staggerChildren: 0.2, delayChildren: 1 },
+          },
+        }}
+      >
+        {[
+          {
+            value: 24,
+            label: "Projects",
+            details: ["Project A", "Project B", "Project C"],
+          },
+          {
+            value: 18,
+            label: "Completed",
+            details: ["Completed A", "Completed B", "Completed C"],
+          },
+          {
+            value: "4.9",
+            label: "Avg. Rating",
+            details: ["Review 1: ⭐⭐⭐⭐⭐", "Review 2: ⭐⭐⭐⭐"],
+          },
+          {
+            value: "3 yrs",
+            label: "Experience",
+            details: ["React", "Node.js", "MongoDB"],
+          },
+        ].map((stat, idx) => (
+          <motion.div
+            key={idx}
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              visible: { opacity: 1, y: 0 },
+            }}
+          >
+            <StatCard {...stat} />
+          </motion.div>
+        ))}
+      </motion.div>
 
       {/* CTA Buttons */}
-      <div className="mt-8 flex flex-wrap gap-4 justify-center md:justify-start">
-        <button className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg shadow-md transition">
+      <motion.div
+        className="mt-8 flex flex-wrap gap-4 justify-center md:justify-start"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5 }}
+      >
+        <button
+          type="button"
+          className="px-6 py-2 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-medium rounded-lg shadow-md transition transform hover:scale-105"
+        >
           Hire Me
         </button>
-        <button className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg shadow-md transition">
+        <button
+          type="button"
+          className="px-6 py-2 bg-gray-700 hover:bg-gray-600 active:bg-gray-700 text-white font-medium rounded-lg shadow-md transition transform hover:scale-105"
+        >
           Message
         </button>
-        <button className="px-6 py-2 border border-gray-600 hover:border-red-500 text-gray-300 hover:text-white font-medium rounded-lg shadow-md transition">
+        <button
+          type="button"
+          className="px-6 py-2 border border-gray-600 hover:border-red-500 text-gray-300 hover:text-white font-medium rounded-lg shadow-md transition transform hover:scale-105"
+        >
           Download CV
         </button>
-      </div>
+      </motion.div>
 
       {/* Social Media Links */}
-      <div className="mt-6 flex gap-6 justify-center md:justify-start text-gray-400">
+      <motion.div
+        className="mt-6 flex gap-6 justify-center md:justify-start text-gray-400"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.8 }}
+      >
         <a
           href="https://linkedin.com/in/yourprofile"
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:text-red-500 transition"
+          aria-label="LinkedIn Profile"
+          className="hover:text-red-500 transition transform hover:scale-110"
         >
           <FaLinkedin size={24} />
         </a>
@@ -100,7 +180,8 @@ export default function ProfileHeader() {
           href="https://github.com/yourprofile"
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:text-red-500 transition"
+          aria-label="GitHub Profile"
+          className="hover:text-red-500 transition transform hover:scale-110"
         >
           <FaGithub size={24} />
         </a>
@@ -108,11 +189,12 @@ export default function ProfileHeader() {
           href="https://twitter.com/yourprofile"
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:text-red-500 transition"
+          aria-label="Twitter Profile"
+          className="hover:text-red-500 transition transform hover:scale-110"
         >
           <FaTwitter size={24} />
         </a>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
