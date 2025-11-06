@@ -4,6 +4,7 @@ import { Project, Milestone } from "./project";
 /* -------------------- CONSULTANTS -------------------- */
 export interface Consultant {
   id: string;
+  _id?: string;
   name: string;
   industry: string;
   delivery: string;
@@ -17,6 +18,7 @@ export interface Consultant {
 /* -------------------- ESCROW TRANSACTIONS -------------------- */
 export interface EscrowTransaction {
   id: string;
+  _id?: string;
   projectId: string;
   amount: number;
   currency: string;
@@ -39,6 +41,7 @@ export interface EscrowTransaction {
 /* -------------------- INVITATIONS -------------------- */
 export interface Invitation {
   id: string;
+  _id?: string;
   invitedBy?: string;
   projectId?: string;
   email?: string;
@@ -53,6 +56,7 @@ export interface Invitation {
 /* -------------------- TEAM MEMBERS -------------------- */
 export interface TeamMember {
   id: string;
+  _id?: string;
   name: string;
   role: string;
   email: string;
@@ -62,6 +66,7 @@ export interface TeamMember {
 /* -------------------- AI AGENT LOGS -------------------- */
 export interface AiActionLog {
   id: string;
+  _id?: string;
   actionType:
     | "onboarding"
     | "project-scoping"
@@ -89,6 +94,7 @@ export interface AiPreferences {
 /* -------------------- BUSINESS PROFILE -------------------- */
 export interface BusinessProfile {
   companyName?: string;
+  _id?: string;
   industry?: string;
   location?: string;
   size?: "1-10" | "11-50" | "51-200" | "200+";
@@ -98,6 +104,7 @@ export interface BusinessProfile {
 /* -------------------- CLIENT PROFILE (MASTER) -------------------- */
 export interface ClientProfile {
   id: string;
+  _id?: string;
   name: string;
   email: string;
 

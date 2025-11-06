@@ -11,6 +11,7 @@ export type MilestoneStatus =
 
 export interface Milestone {
   id?: string;
+  _id?: string;
   title: string;
   description?: string;
   amount?: number;
@@ -21,6 +22,7 @@ export interface Milestone {
 
 export interface Project {
   _id?: string; // DB id
+
   id?: string; // Client id
 
   title: string;

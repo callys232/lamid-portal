@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed": "ts-node --project tsconfig.json src/scripts/seed.ts"
+    "seed": "ts-node scripts/seedClient.ts"
   },
   "dependencies": {
     "axios": "^1.13.1",
