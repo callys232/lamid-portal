@@ -1,70 +1,84 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
-import Project from "@/app/models/Project";
+import ProjectModel from "@/app/models/Project";
 
-// ✅ GET — Retrieve project by ID
 export async function GET(
-  req: NextRequest,
-  context: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
-  await dbConnect();
-  const { id } = context.params;
+  const { id } = await context.params;
+  try {
+    await dbConnect();
+    const project = await ProjectModel.findById(id)
+      .populate("client")
+      .populate("consultants")
+      .populate("milestones")
+      .exec();
 
-  const project = await Project.findById(id);
+    if (!project)
+      return NextResponse.json(
+        { success: false, message: "Project not found" },
+        { status: 404 }
+      );
 
-  if (!project) {
+    return NextResponse.json({
+      success: true,
+      data: { ...project.toObject(), id: project._id.toString() },
+    });
+  } catch (error) {
+    console.error("Error fetching project:", error);
     return NextResponse.json(
-      { success: false, message: "Project not found" },
-      { status: 404 }
+      { success: false, message: "Server error" },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json({ success: true, data: project });
 }
 
-// ✅ PUT — Update project by ID
 export async function PUT(
-  req: NextRequest,
-  context: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
-  await dbConnect();
-  const { id } = context.params;
-  const body = await req.json();
-
-  const updatedProject = await Project.findByIdAndUpdate(id, body, {
-    new: true,
-    runValidators: true,
-  });
-
-  if (!updatedProject) {
+  const { id } = await context.params;
+  try {
+    await dbConnect();
+    const body = await request.json();
+    const updated = await ProjectModel.findByIdAndUpdate(id, body, {
+      new: true,
+    });
+    if (!updated)
+      return NextResponse.json(
+        { success: false, message: "Project not found" },
+        { status: 404 }
+      );
+    return NextResponse.json({ success: true, data: updated });
+  } catch (error) {
+    console.error("Error updating project:", error);
     return NextResponse.json(
-      { success: false, message: "Project not found" },
-      { status: 404 }
+      { success: false, message: "Server error" },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json({ success: true, data: updatedProject });
 }
 
-// ✅ DELETE — Remove project by ID
 export async function DELETE(
-  req: NextRequest,
-  context: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
-  await dbConnect();
-  const { id } = context.params;
-
-  const deleted = await Project.findByIdAndDelete(id);
-
-  if (!deleted) {
+  const { id } = await context.params;
+  try {
+    await dbConnect();
+    const deleted = await ProjectModel.findByIdAndDelete(id);
+    if (!deleted)
+      return NextResponse.json(
+        { success: false, message: "Project not found" },
+        { status: 404 }
+      );
+    return NextResponse.json({ success: true, message: "Project deleted" });
+  } catch (error) {
+    console.error("Error deleting project:", error);
     return NextResponse.json(
-      { success: false, message: "Project not found" },
-      { status: 404 }
+      { success: false, message: "Server error" },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json({
-    success: true,
-    message: "Project deleted successfully",
-  });
 }

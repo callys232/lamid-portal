@@ -1,56 +1,40 @@
-import { NextResponse } from "next/server";
-
-// Mock data for now — replace with DB call
-const projects = [
-  {
-    _id: "p1",
-    title: "AI Dashboard",
-    category: "Software",
-    tech: "React, Node.js",
-    location: "Remote",
-    budget: "$10,000",
-    hourlyRate: "$50/hr",
-    rating: 4.8,
-    organization: "TechCorp",
-    image: "/project-logo.png",
-    milestones: [
-      {
-        id: "m1",
-        title: "Design Phase",
-        description: "UI/UX design completed",
-        amount: 2000,
-        dueDate: "2025-12-01",
-        progress: 100,
-        status: "completed",
-      },
-      {
-        id: "m2",
-        title: "Development Phase",
-        description: "Backend and frontend integration",
-        amount: 5000,
-        dueDate: "2026-01-15",
-        progress: 40,
-        status: "in_progress",
-      },
-    ],
-    consultants: [
-      { id: "c1", name: "Jane Doe" },
-      { id: "c2", name: "John Smith" },
-    ],
-    priority: "High",
-    deadline: "2026-02-01",
-    status: "Active",
-  },
-];
+import { NextRequest, NextResponse } from "next/server";
+import dbConnect from "@/lib/dbConnect";
+import ProjectModel from "@/app/models/Project";
 
 export async function GET(
-  req: Request,
-  { params }: { params: { teamId: string } }
+  request: NextRequest,
+  context: { params: Promise<{ teamId: string }> }
 ) {
-  const { teamId } = params;
+  const { teamId } = await context.params;
 
-  // In real app, fetch from DB using teamId
-  // e.g. const projects = await db.collection("projects").find({ teamId }).toArray();
+  try {
+    await dbConnect();
 
-  return NextResponse.json({ data: projects });
+    const projects = await ProjectModel.find({ team: teamId })
+      .populate("client")
+      .populate("consultants")
+      .populate("milestones")
+      .exec();
+
+    if (!projects.length)
+      return NextResponse.json(
+        { success: false, message: "No projects found for this team" },
+        { status: 404 }
+      );
+
+    return NextResponse.json({
+      success: true,
+      data: projects.map((p) => ({
+        ...p.toObject(),
+        id: p._id.toString(),
+      })),
+    });
+  } catch (error) {
+    console.error("Error fetching team projects:", error);
+    return NextResponse.json(
+      { success: false, message: "Server error" },
+      { status: 500 }
+    );
+  }
 }

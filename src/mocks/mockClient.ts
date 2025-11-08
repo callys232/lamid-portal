@@ -171,7 +171,7 @@ export const mockClients: ClientProfile[] = [
     name: "Caleb",
     email: "techbuddie@example.com",
     companyname: "Fallback Corp",
-    avatar: "https://randomuser.me/api/portraits/men/72.jpg",
+    avatar: "https://randomuser.me/api/portraits/black/72.jpg",
     bio: "Tech enthusiast building solutions with AI and web automation.",
     isPremium: true,
     projects: [...teamProjects, ...individualProjects],

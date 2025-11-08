@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 import dbConnect from "@/lib/dbConnect";
 import Client from "@/app/models/Client";
 import Project from "@/app/models/Project";
-import Consultant from "@/app/models/Consultant";
-import Escrow from "@/models/Escrow";
-import Invitation from "@/models/Invitation";
+import Consultant from "@/app/models/Consultants";
+import Escrow from "@/app/models/Escrow";
+import Invitation from "@/app/models/Invitation";
 
 async function seed() {
   await dbConnect();
