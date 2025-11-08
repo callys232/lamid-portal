@@ -1,124 +1,206 @@
-import { ClientProfile } from "@/types/client";
+// mocks/mockClient.ts
+import {
+  ClientProfile,
+  Consultant,
+  TeamMember,
+  EscrowTransaction,
+  Invitation,
+  AiActionLog,
+} from "@/types/client";
+import { Project, Milestone } from "@/types/project";
 
-export const mockClient: ClientProfile = {
-  id: "client-001",
-  name: "Jane Doe",
-  email: "jane.doe@techcorp.com",
-  companyName: "TechCorp Solutions",
-  industry: "Software Development",
-  location: "Remote",
+/* -------------------- MILESTONES -------------------- */
+export const exampleMilestones: Milestone[] = [
+  {
+    id: "m1",
+    title: "Design Phase",
+    description: "UI/UX design and prototype creation",
+    progress: 100,
+    status: "completed",
+  },
+  {
+    id: "m2",
+    title: "Development Phase",
+    description: "Frontend and backend development",
+    progress: 50,
+    status: "in_progress",
+  },
+  {
+    id: "m3",
+    title: "Testing & QA",
+    description: "Final testing and client feedback integration",
+    progress: 0,
+    status: "pending",
+  },
+];
 
-  projects: [
-    {
-      _id: "proj-db-001",
-      id: "proj-001",
-      title: "AI-Powered Analytics Dashboard",
-      category: "Data Science",
-      tech: "React, Node.js, Python",
-      location: "Remote",
-      budget: "$25,000",
-      hourlyRate: "$80",
-      rating: 4.7,
-      organization: "TechCorp",
-      image: "/images/projects/dashboard.png",
-      consultants: [
-        { id: "cons-001", name: "Michael Smith" }, // ✅ trimmed
-      ],
-    },
-    {
-      _id: "proj-db-002",
-      id: "proj-002",
-      title: "Mobile Banking App",
-      category: "FinTech",
-      tech: "Flutter, Firebase",
-      location: "Lagos, Nigeria",
-      budget: "$40,000",
-      hourlyRate: "$90",
-      rating: 4.5,
-      organization: "FinServe Ltd",
-      image: "/images/projects/mobilebank.png",
-      consultants: [
-        { id: "cons-002", name: "Sarah Johnson" }, // ✅ trimmed
-      ],
-    },
-  ],
+/* -------------------- PROJECTS -------------------- */
+export const teamProjects: Project[] = [
+  {
+    id: "tp1",
+    title: "Team Project Alpha",
+    category: "Web",
+    tech: "React.js",
+    budget: "$5000",
+    status: "ongoing",
+    milestones: exampleMilestones,
+  },
+  {
+    id: "tp2",
+    title: "Team Project Beta",
+    category: "Mobile",
+    tech: "Flutter",
+    budget: "$8000",
+    status: "completed",
+    milestones: exampleMilestones.slice(0, 2),
+  },
+];
 
-  consultants: [
-    {
-      id: "cons-001",
-      name: "Michael Smith",
-      industry: "Data Science",
-      delivery: "Agile Sprints",
-      rate: "$75",
-      rating: 5,
-      image: "/images/consultants/michael.png",
-      experience: 6,
-      role: "Lead Consultant",
-    },
-    {
-      id: "cons-002",
-      name: "Sarah Johnson",
-      industry: "Mobile Development",
-      delivery: "Milestone-Based",
-      rate: "$85",
-      rating: 4,
-      image: "/images/consultants/sarah.png",
-      experience: 4,
-      role: "Mobile Engineer",
-    },
-    {
-      id: "cons-003",
-      name: "David Lee",
-      industry: "Cloud Infrastructure",
-      delivery: "Continuous Delivery",
-      rate: "$95",
-      rating: 5,
-      image: "/images/consultants/david.png",
-      experience: 8,
-      role: "Cloud Architect",
-    },
-  ],
+export const individualProjects: Project[] = [
+  {
+    id: "ip1",
+    title: "Individual Project Gamma",
+    category: "AI",
+    tech: "Python",
+    budget: "$2000",
+    status: "ongoing",
+    milestones: exampleMilestones,
+  },
+  {
+    id: "ip2",
+    title: "Individual Project Delta",
+    category: "Design",
+    tech: "Figma",
+    budget: "$1000",
+    status: "completed",
+    milestones: exampleMilestones.slice(0, 1),
+  },
+];
 
-  escrowTransactions: [
-    {
-      id: "escrow-001",
-      projectId: "proj-001", // ✅ required by type
-      amount: 5000,
-      currency: "USD",
-      status: "funded",
-      createdAt: "2025-10-01T10:00:00Z",
-      updatedAt: "2025-10-02T12:00:00Z",
-    },
-    {
-      id: "escrow-002",
-      projectId: "proj-002", // ✅ required by type
-      amount: 12000,
-      currency: "USD",
-      status: "pending",
-      createdAt: "2025-10-15T09:30:00Z",
-      updatedAt: "2025-10-15T09:30:00Z",
-    },
-  ],
+/* -------------------- CONSULTANTS -------------------- */
+export const mockConsultants: Consultant[] = [
+  {
+    id: "c1",
+    name: "Jane Smith",
+    industry: "Technology",
+    delivery: "Remote",
+    rate: "$50/hr",
+    rating: 4.7,
+    role: "Lead Developer",
+    email: "jane@example.com",
+    image: "https://randomuser.me/api/portraits/women/65.jpg",
+    projects: [individualProjects[0]],
+  },
+  {
+    id: "c2",
+    name: "Bob Brown",
+    industry: "Finance",
+    delivery: "Onsite",
+    rate: "$60/hr",
+    rating: 4.5,
+    role: "Financial Consultant",
+    email: "bob@example.com",
+    image: "https://randomuser.me/api/portraits/men/70.jpg",
+    projects: [individualProjects[1]],
+  },
+];
 
-  invitations: [
-    {
-      id: "invite-001",
-      projectId: "proj-001",
-      invitedBy: "admin@techcorp.com",
-      method: "email", // ✅ required by type
-      status: "accepted",
-      createdAt: "2025-09-20T08:00:00Z",
-    },
-    {
-      id: "invite-002",
-      projectId: "proj-002",
-      invitedBy: "hr@finserve.com",
-      method: "email", // ✅ required by type
-      status: "pending",
-      createdAt: "2025-10-05T14:00:00Z",
-    },
-  ],
+/* -------------------- TEAM MEMBERS -------------------- */
+export const mockTeamMembers: TeamMember[] = [
+  {
+    id: "t1",
+    name: "Alice Cooper",
+    role: "Project Manager",
+    email: "alice@example.com",
+    addedAt: new Date().toISOString(),
+    projects: [teamProjects[0]],
+  },
+  {
+    id: "t2",
+    name: "David Kim",
+    role: "UI Designer",
+    email: "david@example.com",
+    addedAt: new Date().toISOString(),
+    projects: [teamProjects[1]],
+  },
+];
 
-  createdAt: "2025-09-01T12:00:00Z",
-  updatedAt: "2025-10-20T15:00:00Z",
-};
+/* -------------------- ESCROW TRANSACTIONS -------------------- */
+export const mockEscrowTransactions: EscrowTransaction[] = [
+  {
+    id: "e1",
+    projectId: "tp1",
+    amount: 500,
+    currency: "USD",
+    status: "released",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    milestoneId: "m1",
+  },
+];
+
+/* -------------------- INVITATIONS -------------------- */
+export const mockInvitations: Invitation[] = [
+  {
+    id: "i1",
+    invitedBy: "client1",
+    consultantId: "c1",
+    method: "consultant",
+    status: "pending",
+    createdAt: new Date().toISOString(),
+  },
+];
+
+/* -------------------- AI LOGS -------------------- */
+export const mockAiLogs: AiActionLog[] = [
+  {
+    id: "log1",
+    actionType: "matching",
+    message: "AI matched consultant Jane Smith to Project Gamma.",
+    createdAt: new Date().toISOString(),
+    relatedProjectId: "ip1",
+    relatedConsultantId: "c1",
+  },
+];
+
+/* -------------------- CLIENTS -------------------- */
+export const mockClients: ClientProfile[] = [
+  {
+    id: "client1",
+    username: "CatalForc",
+    name: "Caleb",
+    email: "techbuddie@example.com",
+    companyname: "Fallback Corp",
+    avatar: "https://randomuser.me/api/portraits/men/72.jpg",
+    bio: "Tech enthusiast building solutions with AI and web automation.",
+    isPremium: true,
+    projects: [...teamProjects, ...individualProjects],
+    consultants: mockConsultants,
+    teamMembers: mockTeamMembers,
+    escrowTransactions: mockEscrowTransactions,
+    invitations: mockInvitations,
+    aiLogs: mockAiLogs,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "client2",
+    username: "alicej",
+    name: "Alice Johnson",
+    email: "alice@example.com",
+    companyname: "Example LLC",
+    avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+    isPremium: false,
+    projects: [...teamProjects, ...individualProjects],
+    consultants: mockConsultants,
+    teamMembers: mockTeamMembers,
+    escrowTransactions: [],
+    invitations: [],
+    aiLogs: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+];
+
+/* -------------------- ACTIVE CLIENT -------------------- */
+export const activeClient = mockClients[0];

@@ -1,5 +1,6 @@
 // types/client.ts
-import { Project, Milestone } from "./project";
+import { Project } from "./project";
+import { Milestone } from "./project";
 
 /* -------------------- CONSULTANTS -------------------- */
 export interface Consultant {
@@ -13,6 +14,10 @@ export interface Consultant {
   image?: string;
   experience?: number;
   role: string;
+  email?: string;
+
+  // ✅ Consultants can have their own projects
+  projects?: Project[];
 }
 
 /* -------------------- ESCROW TRANSACTIONS -------------------- */
@@ -61,6 +66,9 @@ export interface TeamMember {
   role: string;
   email: string;
   addedAt: string;
+
+  // ✅ Team members can have their own projects
+  projects?: Project[];
 }
 
 /* -------------------- AI AGENT LOGS -------------------- */
@@ -107,6 +115,7 @@ export interface ClientProfile {
   _id?: string;
   name: string;
   email: string;
+  username: string | number;
 
   business?: BusinessProfile;
   ai?: AiPreferences;
@@ -120,4 +129,8 @@ export interface ClientProfile {
 
   createdAt: string;
   updatedAt: string;
+  companyname?: string;
+  bio?: string;
+  isPremium?: boolean;
+  avatar?: string;
 }

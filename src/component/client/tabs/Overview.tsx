@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Project, Milestone } from "@/types/project";
 import {
   ClientProfile,
@@ -9,6 +9,7 @@ import {
   Invitation,
   Consultant,
 } from "@/types/client";
+import { Edit, PlusCircle, Search, CheckCircle, XCircle } from "lucide-react";
 
 interface ClientOverviewProps {
   client: ClientProfile;
@@ -19,8 +20,8 @@ export default function ClientOverview({
   client,
   isPremium = false,
 }: ClientOverviewProps) {
-  const projects = client.projects;
-  const consultants = client.consultants;
+  const projects = client.projects || [];
+  const consultants = client.consultants || [];
 
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [escrows, setEscrows] = useState<EscrowTransaction[]>(
@@ -31,54 +32,72 @@ export default function ClientOverview({
   );
   const [filterInvitations, setFilterInvitations] = useState("");
 
-  // ---- Derived ----
-  const milestonesOfSelected = useMemo<Milestone[]>(
+  const [escrowAmount, setEscrowAmount] = useState("");
+  const [escrowDate, setEscrowDate] = useState("");
+  const [escrowMilestone, setEscrowMilestone] = useState("");
+
+  // ---- Derived Data ----
+  const milestonesOfSelected: Milestone[] = useMemo(
     () => selectedProject?.milestones || [],
     [selectedProject]
   );
 
   const projectProgress = useMemo(() => {
     if (!milestonesOfSelected.length) return 0;
-    const completed = milestonesOfSelected.filter(
+    const completedCount = milestonesOfSelected.filter(
       (m) => m.status === "completed"
     ).length;
-    return Math.round((completed / milestonesOfSelected.length) * 100);
+    return Math.round((completedCount / milestonesOfSelected.length) * 100);
   }, [milestonesOfSelected]);
 
+  const filteredInvitations = useMemo(() => {
+    return invitations.filter((inv) => {
+      const consultantName =
+        inv.consultantId &&
+        consultants.find((c) => c.id === inv.consultantId)?.name;
+      const senderName =
+        consultants.find((c) => c.id === inv.invitedBy)?.name || "You";
+
+      const searchTarget = `${inv.status} ${
+        consultantName || ""
+      } ${senderName} ${inv.method}`.toLowerCase();
+      return searchTarget.includes(filterInvitations.toLowerCase());
+    });
+  }, [invitations, filterInvitations, consultants]);
+
   // ---- Handlers ----
-  const handleAddEscrow = (
-    amount: number,
-    milestoneId?: string,
-    releaseDate?: string
-  ) => {
-    if (!selectedProject) return;
+  const handleAddEscrow = () => {
+    if (!selectedProject || !escrowAmount) return;
 
     const newEscrow: EscrowTransaction = {
       id: crypto.randomUUID(),
       projectId: selectedProject.id!,
-      amount,
+      amount: Number(escrowAmount),
       currency: "USD",
       status: "pending",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      milestoneId,
-      releaseDate,
+      milestoneId: escrowMilestone || undefined,
+      releaseDate: escrowDate || undefined,
       notes: "",
-      milestones: selectedProject.milestones,
+      milestones: selectedProject.milestones || [],
     };
 
     setEscrows((prev) => [...prev, newEscrow]);
+    setEscrowAmount("");
+    setEscrowDate("");
+    setEscrowMilestone("");
   };
 
   const handleInviteConsultant = (consultantId: string) => {
-    if (!selectedProject) return;
+    if (!selectedProject || !consultantId) return;
 
     const newInvitation: Invitation = {
       id: crypto.randomUUID(),
-      projectId: selectedProject.id,
+      projectId: selectedProject.id!,
       invitedBy: client.id,
       consultantId,
-      method: "consultant", // <-- required by type
+      method: "consultant",
       status: "pending",
       createdAt: new Date().toISOString(),
     };
@@ -86,18 +105,16 @@ export default function ClientOverview({
     setInvitations((prev) => [...prev, newInvitation]);
   };
 
-  const filteredInvitations = useMemo(() => {
-    return invitations.filter((inv) => {
-      const consultantName = inv.consultantId
-        ? consultants.find((c) => c.id === inv.consultantId)?.name || ""
-        : "";
-      const senderName =
-        consultants.find((c) => c.id === inv.invitedBy)?.name || "You";
-      const target =
-        `${inv.status} ${consultantName} ${senderName} ${inv.method}`.toLowerCase();
-      return target.includes(filterInvitations.toLowerCase());
-    });
-  }, [invitations, filterInvitations, consultants]);
+  const handleUpdateInvitationStatus = (
+    invitationId: string,
+    status: "accepted" | "rejected"
+  ) => {
+    setInvitations((prev) =>
+      prev.map((inv) =>
+        inv.id === invitationId ? ({ ...inv, status } as Invitation) : inv
+      )
+    );
+  };
 
   // ---- Animations ----
   const fadeSlide = {
@@ -107,48 +124,55 @@ export default function ClientOverview({
   };
 
   return (
-    <div className="w-full p-6 space-y-6 text-white bg-[#0c0000] min-h-screen">
+    <div className="w-full p-6 space-y-8 text-white bg-gradient-to-br from-black via-gray-950 to-gray-900 min-h-screen">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">
-          {client.companyName || client.name}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <h1 className="text-3xl font-extrabold tracking-tight text-white">
+          {client.companyname || client.name}
         </h1>
-        <button className="px-4 py-2 bg-red-600 rounded hover:bg-red-700">
-          Edit Profile
+        <button
+          className="px-5 py-2 bg-red-600 rounded-lg hover:bg-red-700 flex items-center gap-2 shadow-md transition"
+          aria-label="Edit client profile"
+        >
+          <Edit size={18} /> Edit Profile
         </button>
       </div>
 
       {/* Client Details */}
-      <section className="bg-gray-900 border border-gray-800 rounded-md p-4 space-y-4">
-        <h2 className="text-xl font-semibold">Client Details</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <section className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-4 shadow-lg">
+        <h2 className="text-xl font-semibold text-red-400">Client Details</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <input
             type="text"
-            defaultValue={client.name}
+            value={client.name}
+            readOnly
             placeholder="Contact Name"
-            className="px-3 py-2 rounded bg-gray-800 border border-gray-700 w-full"
+            className="px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 w-full focus:ring-2 focus:ring-red-500"
+            aria-label="Contact Name"
           />
           <input
             type="email"
-            defaultValue={client.email}
+            value={client.email}
+            readOnly
             placeholder="Email"
-            className="px-3 py-2 rounded bg-gray-800 border border-gray-700 w-full"
+            className="px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 w-full focus:ring-2 focus:ring-red-500"
+            aria-label="Email"
           />
         </div>
       </section>
 
-      {/* Project Section */}
-      <section className="bg-gray-900 border border-gray-800 rounded-md p-4 space-y-4">
-        <h2 className="text-xl font-semibold">Projects</h2>
+      {/* Projects */}
+      <section className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-4 shadow-lg">
+        <h2 className="text-xl font-semibold text-red-400">Projects</h2>
         <select
-          aria-label="activeselection"
-          className="w-full px-3 py-2 rounded bg-gray-800 border border-gray-700"
+          aria-label="Select project"
+          className="w-full px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-red-500"
           value={selectedProject?.id || ""}
-          onChange={(e) =>
-            setSelectedProject(
-              projects.find((p) => p.id === e.target.value) || null
-            )
-          }
+          onChange={(e) => {
+            const selected =
+              projects.find((p) => p.id === e.target.value) ?? null;
+            setSelectedProject(selected);
+          }}
         >
           <option value="">-- Select Project --</option>
           {projects.map((p) => (
@@ -158,179 +182,228 @@ export default function ClientOverview({
           ))}
         </select>
 
-        {selectedProject && (
-          <motion.div
-            variants={fadeSlide}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="mt-4"
-          >
-            <h3 className="font-semibold text-lg">{selectedProject.title}</h3>
-            <p>Category: {selectedProject.category}</p>
-            <p>Tech: {selectedProject.tech}</p>
-            <p>
-              Project Progress:{" "}
-              <span className="font-semibold">{projectProgress}%</span>
-            </p>
+        <AnimatePresence>
+          {selectedProject && (
+            <motion.div
+              variants={fadeSlide}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="mt-4 space-y-3"
+            >
+              <h3 className="font-semibold text-lg text-white">
+                {selectedProject.title}
+              </h3>
+              <p className="text-gray-400">
+                Category: {selectedProject.category}
+              </p>
+              <p className="text-gray-400">
+                Tech: {selectedProject.tech || "N/A"}
+              </p>
+              <p className="text-gray-300">
+                Progress:{" "}
+                <span className="font-semibold text-red-400">
+                  {projectProgress}%
+                </span>
+              </p>
 
-            {/* Milestones */}
-            <ul className="space-y-2 mt-2">
-              {milestonesOfSelected.map((m) => {
-                const prog = m.progress ?? (m.status === "completed" ? 100 : 0);
-                return (
-                  <li
-                    key={m.id}
-                    className="bg-gray-800 rounded p-2 flex flex-col md:flex-row md:justify-between gap-2"
-                  >
-                    <div>
-                      <p>{m.title}</p>
-                      <p className="text-xs text-gray-400">
-                        Due:{" "}
-                        {m.dueDate
-                          ? new Date(m.dueDate).toLocaleDateString()
-                          : "—"}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2 md:gap-4 flex-1">
-                      <div className="w-full bg-gray-700 rounded h-2 overflow-hidden">
-                        <div
-                          className="h-2 bg-red-600 transition-all"
-                          style={{ width: `${prog}%` }}
-                        />
+              {/* Milestones */}
+              <ul className="space-y-2 mt-2 overflow-x-auto">
+                {milestonesOfSelected.map((m) => {
+                  const progress =
+                    m.progress ?? (m.status === "completed" ? 100 : 0);
+                  return (
+                    <li
+                      key={m.id}
+                      className="bg-gray-800 rounded-lg p-3 flex flex-col md:flex-row md:justify-between gap-2 shadow-sm"
+                    >
+                      <div>
+                        <p className="font-medium">{m.title}</p>
+                        <p className="text-xs text-gray-400">
+                          Due:{" "}
+                          {m.dueDate
+                            ? new Date(m.dueDate).toLocaleDateString()
+                            : "—"}
+                        </p>
                       </div>
-                      <span className="text-xs">{m.status}</span>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </motion.div>
-        )}
+                      <div className="flex items-center gap-2 md:gap-4 flex-1">
+                        <div className="w-full bg-gray-700 rounded h-2 overflow-hidden">
+                          <div
+                            className="h-2 bg-red-600 transition-all"
+                            style={{ width: `${progress}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-gray-400">
+                          {m.status}
+                        </span>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </section>
-
       {/* Escrow */}
-      <section className="bg-gray-900 border border-gray-800 rounded-md p-4 space-y-4">
-        <h2 className="text-xl font-semibold">Escrow</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <section className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-4 shadow-lg">
+        <h2 className="text-xl font-semibold text-red-400">Escrow</h2>
+        <div className="flex flex-col sm:flex-row gap-3">
           <input
-            id="escrowAmount"
+            type="number"
+            aria-label="Escrow Amount"
+            value={escrowAmount}
+            onChange={(e) => setEscrowAmount(e.target.value)}
             placeholder="Amount"
-            className="px-3 py-2 rounded bg-gray-800 border border-gray-700 w-full"
+            className="px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 w-full focus:ring-2 focus:ring-red-500"
           />
           <input
-            aria-label="date"
-            id="escrowDate"
             type="date"
-            className="px-3 py-2 rounded bg-gray-800 border border-gray-700 w-full"
+            aria-label="Escrow Release Date"
+            value={escrowDate}
+            onChange={(e) => setEscrowDate(e.target.value)}
+            className="px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 w-full focus:ring-2 focus:ring-red-500"
           />
           <select
-            aria-label="escrowmilestone"
-            id="escrowMilestone"
-            className="px-3 py-2 rounded bg-gray-800 border border-gray-700 w-full"
+            aria-label="Escrow Milestone"
+            value={escrowMilestone}
+            onChange={(e) => setEscrowMilestone(e.target.value)}
+            className="px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 w-full focus:ring-2 focus:ring-red-500"
           >
-            <option value="">Select Milestone</option>
+            <option value="">-- Select Milestone --</option>
             {milestonesOfSelected.map((m) => (
               <option key={m.id} value={m.id}>
                 {m.title}
               </option>
             ))}
           </select>
+          <button
+            onClick={handleAddEscrow}
+            className="px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 flex items-center gap-2 shadow-md transition"
+          >
+            <PlusCircle size={18} /> Add Escrow
+          </button>
         </div>
 
-        <button
-          onClick={() => {
-            const amount = Number(
-              (document.getElementById("escrowAmount") as HTMLInputElement)
-                .value
-            );
-            const date = (
-              document.getElementById("escrowDate") as HTMLInputElement
-            ).value;
-            const milestoneId = (
-              document.getElementById("escrowMilestone") as HTMLSelectElement
-            ).value;
-            handleAddEscrow(amount, milestoneId, date);
-          }}
-          className="px-4 py-2 bg-red-600 rounded hover:bg-red-700"
-        >
-          Add Escrow
-        </button>
-
         {/* Escrow List */}
-        <ul className="space-y-2 mt-2">
-          {escrows
-            .filter((e) => e.projectId === selectedProject?.id)
-            .map((e) => (
-              <li
-                key={e.id}
-                className="flex justify-between bg-gray-800 rounded p-2"
-              >
-                <span>
-                  ${e.amount} — {e.status}
-                  {e.milestoneId &&
-                    ` for ${
-                      milestonesOfSelected.find((m) => m.id === e.milestoneId)
-                        ?.title
-                    }`}
-                </span>
-              </li>
-            ))}
+        <ul className="space-y-2 mt-4">
+          {escrows.map((escrow) => (
+            <li
+              key={escrow.id}
+              className="bg-gray-800 rounded-lg p-4 flex flex-col md:flex-row md:justify-between gap-2 shadow-sm"
+            >
+              <div>
+                <p className="font-semibold text-white">
+                  ${escrow.amount} {escrow.currency}
+                </p>
+                <p className="text-xs text-gray-400">
+                  Milestone:{" "}
+                  {escrow.milestoneId
+                    ? milestonesOfSelected.find(
+                        (m) => m.id === escrow.milestoneId
+                      )?.title
+                    : "—"}
+                </p>
+              </div>
+              <div className="text-xs text-gray-400">
+                Status: {escrow.status} <br />
+                Release:{" "}
+                {escrow.releaseDate
+                  ? new Date(escrow.releaseDate).toLocaleDateString()
+                  : "—"}
+              </div>
+            </li>
+          ))}
         </ul>
       </section>
 
       {/* Invitations */}
-      <section className="bg-gray-900 border border-gray-800 rounded-md p-4 space-y-4">
-        <h2 className="text-xl font-semibold">Invitations</h2>
+      <section className="bg-gray-900/80 border border-gray-800 rounded-xl p-6 space-y-4 shadow-lg">
+        <h2 className="text-xl font-semibold text-red-400">
+          Consultant Invitations
+        </h2>
 
-        <div className="flex gap-2">
+        {/* Search Filter */}
+        <div className="flex items-center gap-2">
+          <Search size={18} className="text-gray-400" />
+          <input
+            type="text"
+            aria-label="Filter Invitations"
+            value={filterInvitations}
+            onChange={(e) => setFilterInvitations(e.target.value)}
+            placeholder="Search invitations..."
+            className="px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 w-full focus:ring-2 focus:ring-red-500"
+          />
+        </div>
+
+        {/* Invite Consultant */}
+        <div className="flex gap-2 mt-2">
           <select
-            aria-label="invite"
-            className="flex-1 px-3 py-2 rounded bg-gray-800 border border-gray-700"
-            onChange={(e) => {
-              if (e.target.value) handleInviteConsultant(e.target.value);
-            }}
+            aria-label="Select Consultant"
+            className="px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 flex-1 focus:ring-2 focus:ring-red-500"
+            onChange={(e) => handleInviteConsultant(e.target.value)}
           >
-            <option value="">-- Select Consultant --</option>
+            <option value="">-- Invite Consultant --</option>
             {consultants.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.name} ({c.industry})
+                {c.name}
               </option>
             ))}
           </select>
-          <button className="px-4 py-2 bg-red-600 rounded hover:bg-red-700">
-            Invite
-          </button>
         </div>
 
-        <input
-          type="text"
-          placeholder="Filter invitations..."
-          className="px-3 py-1 rounded bg-gray-800 border border-gray-700 w-full text-sm"
-          value={filterInvitations}
-          onChange={(e) => setFilterInvitations(e.target.value)}
-        />
+        {/* Invitations List */}
+        <ul className="space-y-2 mt-4">
+          {filteredInvitations.length > 0 ? (
+            filteredInvitations.map((inv) => {
+              const consultantName =
+                consultants.find((c) => c.id === inv.consultantId)?.name ||
+                "Unknown";
+              const senderName =
+                consultants.find((c) => c.id === inv.invitedBy)?.name || "You";
 
-        <ul className="space-y-2 mt-2">
-          {filteredInvitations.map((inv) => {
-            const consultantName = inv.consultantId
-              ? consultants.find((c) => c.id === inv.consultantId)?.name ||
-                "Unknown"
-              : "";
-            const senderName =
-              consultants.find((c) => c.id === inv.invitedBy)?.name || "You";
-            return (
-              <li
-                key={inv.id}
-                className="flex justify-between bg-gray-800 rounded p-2"
-              >
-                <span>
-                  {consultantName || "—"} — {inv.status} (sent by {senderName},
-                  via {inv.method})
-                </span>
-              </li>
-            );
-          })}
+              return (
+                <li
+                  key={inv.id}
+                  className="bg-gray-800 rounded-lg p-4 flex flex-col md:flex-row md:justify-between gap-2 shadow-sm"
+                >
+                  <div>
+                    <p className="font-semibold text-white">{consultantName}</p>
+                    <p className="text-xs text-gray-400">
+                      Invited by: {senderName}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400">
+                      Status: {inv.status}
+                    </span>
+                    {inv.status === "pending" && (
+                      <>
+                        <button
+                          onClick={() =>
+                            handleUpdateInvitationStatus(inv.id, "accepted")
+                          }
+                          className="px-2 py-1 bg-green-600 rounded text-xs hover:bg-green-700 flex items-center gap-1"
+                        >
+                          <CheckCircle size={14} /> Accept
+                        </button>
+                        <button
+                          onClick={() =>
+                            handleUpdateInvitationStatus(inv.id, "rejected")
+                          }
+                          className="px-2 py-1 bg-red-600 rounded text-xs hover:bg-red-700 flex items-center gap-1"
+                        >
+                          <XCircle size={14} /> Reject
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </li>
+              );
+            })
+          ) : (
+            <p className="text-gray-400 text-sm">No invitations found.</p>
+          )}
         </ul>
       </section>
     </div>
