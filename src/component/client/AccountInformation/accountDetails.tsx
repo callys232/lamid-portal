@@ -72,7 +72,7 @@ export default function AccountDetails({
           <input
             id="companyName"
             name="companyName"
-            value={formData.companyName ?? ""}
+            value={formData.companyname ?? ""}
             onChange={handleChange}
             className="w-full mt-1 p-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-600"
           />

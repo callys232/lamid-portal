@@ -18,7 +18,7 @@ export default function ClientSettings({
   const [formData, setFormData] = useState({
     name: client.name,
     email: client.email,
-    companyName: client.companyName || "",
+    companyName: client.companyname || "",
     industry: client.industry || "",
     location: client.location || "",
     password: "",

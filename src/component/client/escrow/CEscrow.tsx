@@ -81,7 +81,7 @@ export default function ClientEscrow({
       <h1 className="text-2xl font-bold text-white">Client Escrow</h1>
       <p className="text-gray-400">
         Manage escrow accounts for{" "}
-        <span className="font-semibold">{client.companyName}</span> projects.
+        <span className="font-semibold">{client.companyname}</span> projects.
       </p>
 
       {/* Filter + Add Escrow */}

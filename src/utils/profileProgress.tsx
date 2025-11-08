@@ -7,7 +7,7 @@ export function computeProfileProgress(client: ClientProfile | null): number {
   const fieldsToCheck: (keyof ClientProfile)[] = [
     "name",
     "email",
-    "companyName",
+    "companyname",
     "industry",
     "location",
   ];

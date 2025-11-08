@@ -1,156 +1,185 @@
-import { ClientProfile } from "@/types/client";
+// mocks/mockClient.ts
+import {
+  ClientProfile,
+  Consultant,
+  TeamMember,
+  EscrowTransaction,
+  Invitation,
+  AiActionLog,
+} from "@/types/client";
 import { Project, Milestone } from "@/types/project";
 
-const exampleMilestones: Milestone[] = [
+/* -------------------- MILESTONES -------------------- */
+export const exampleMilestones: Milestone[] = [
   {
     id: "m1",
     title: "Design Phase",
-    amount: 500,
-    dueDate: new Date().toISOString(),
-    status: "completed",
+    description: "UI/UX design and prototype creation",
     progress: 100,
+    status: "completed",
   },
   {
     id: "m2",
     title: "Development Phase",
-    amount: 1000,
-    dueDate: new Date().toISOString(),
-    status: "in_progress",
+    description: "Frontend and backend development",
     progress: 50,
+    status: "in_progress",
   },
   {
     id: "m3",
     title: "Testing & QA",
-    amount: 300,
-    dueDate: new Date().toISOString(),
-    status: "pending",
+    description: "Final testing and client feedback integration",
     progress: 0,
+    status: "pending",
   },
 ];
 
-const exampleProjects: Project[] = [
+/* -------------------- PROJECTS -------------------- */
+export const teamProjects: Project[] = [
   {
-    id: "p1",
-    title: "Project Alpha",
+    id: "tp1",
+    title: "Team Project Alpha",
     category: "Web",
-    tech: "React",
+    tech: "React.js",
+    budget: "$5000",
     status: "ongoing",
     milestones: exampleMilestones,
-    consultants: [{ id: "c1", name: "Jane Smith" }],
-    priority: "High",
   },
   {
-    id: "p2",
-    title: "Project Beta",
+    id: "tp2",
+    title: "Team Project Beta",
     category: "Mobile",
     tech: "Flutter",
+    budget: "$8000",
     status: "completed",
     milestones: exampleMilestones.slice(0, 2),
-    consultants: [{ id: "c2", name: "Bob Brown" }],
-    priority: "Medium",
-  },
-  {
-    id: "p3",
-    title: "Project Gamma",
-    category: "AI",
-    tech: "Python",
-    status: "new",
-    milestones: exampleMilestones.slice(1),
-    consultants: [{ id: "c3", name: "Sara Kim" }],
-    priority: "Low",
   },
 ];
 
+export const individualProjects: Project[] = [
+  {
+    id: "ip1",
+    title: "Individual Project Gamma",
+    category: "AI",
+    tech: "Python",
+    budget: "$2000",
+    status: "ongoing",
+    milestones: exampleMilestones,
+  },
+  {
+    id: "ip2",
+    title: "Individual Project Delta",
+    category: "Design",
+    tech: "Figma",
+    budget: "$1000",
+    status: "completed",
+    milestones: exampleMilestones.slice(0, 1),
+  },
+];
+
+/* -------------------- CONSULTANTS -------------------- */
+export const mockConsultants: Consultant[] = [
+  {
+    id: "c1",
+    name: "Jane Smith",
+    industry: "Technology",
+    delivery: "Remote",
+    rate: "$50/hr",
+    rating: 4.7,
+    role: "Lead Developer",
+    email: "jane@example.com",
+    image: "https://randomuser.me/api/portraits/women/65.jpg",
+    projects: [individualProjects[0]],
+  },
+  {
+    id: "c2",
+    name: "Bob Brown",
+    industry: "Finance",
+    delivery: "Onsite",
+    rate: "$60/hr",
+    rating: 4.5,
+    role: "Financial Consultant",
+    email: "bob@example.com",
+    image: "https://randomuser.me/api/portraits/men/70.jpg",
+    projects: [individualProjects[1]],
+  },
+];
+
+/* -------------------- TEAM MEMBERS -------------------- */
+export const mockTeamMembers: TeamMember[] = [
+  {
+    id: "t1",
+    name: "Alice Cooper",
+    role: "Project Manager",
+    email: "alice@example.com",
+    addedAt: new Date().toISOString(),
+    projects: [teamProjects[0]],
+  },
+  {
+    id: "t2",
+    name: "David Kim",
+    role: "UI Designer",
+    email: "david@example.com",
+    addedAt: new Date().toISOString(),
+    projects: [teamProjects[1]],
+  },
+];
+
+/* -------------------- ESCROW TRANSACTIONS -------------------- */
+export const mockEscrowTransactions: EscrowTransaction[] = [
+  {
+    id: "e1",
+    projectId: "tp1",
+    amount: 500,
+    currency: "USD",
+    status: "released",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    milestoneId: "m1",
+  },
+];
+
+/* -------------------- INVITATIONS -------------------- */
+export const mockInvitations: Invitation[] = [
+  {
+    id: "i1",
+    invitedBy: "client1",
+    consultantId: "c1",
+    method: "consultant",
+    status: "pending",
+    createdAt: new Date().toISOString(),
+  },
+];
+
+/* -------------------- AI LOGS -------------------- */
+export const mockAiLogs: AiActionLog[] = [
+  {
+    id: "log1",
+    actionType: "matching",
+    message: "AI matched consultant Jane Smith to Project Gamma.",
+    createdAt: new Date().toISOString(),
+    relatedProjectId: "ip1",
+    relatedConsultantId: "c1",
+  },
+];
+
+/* -------------------- CLIENTS -------------------- */
 export const mockClients: ClientProfile[] = [
   {
     id: "client1",
-    username: "johndoe",
-    name: "John Doe",
-    email: "john@example.com",
+    username: "CatalForc",
+    name: "Caleb",
+    email: "techbuddie@example.com",
     companyname: "Fallback Corp",
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-    notifications: [
-      {
-        id: "n1",
-        type: "project",
-        message: "New milestone added to Project Alpha",
-        read: false,
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: "n2",
-        type: "escrow",
-        message: "Escrow payment released for Design Phase",
-        read: true,
-        createdAt: new Date().toISOString(),
-      },
-    ],
-    business: {
-      companyName: "Fallback Corp",
-      industry: "Tech",
-      location: "Remote",
-      size: "11-50",
-      website: "https://fallbackcorp.com",
-    },
-    ai: {
-      tone: "friendly",
-      automationLevel: "assist",
-      onboardingCompleted: true,
-      industryKeywords: ["web", "mobile", "AI"],
-      aiAssistantEnabled: true,
-    },
-    projects: exampleProjects,
-    consultants: [
-      {
-        id: "c1",
-        name: "Jane Smith",
-        industry: "Tech",
-        delivery: "Remote",
-        rate: "$50/hr",
-        rating: 4.7,
-        role: "Lead Developer",
-        experience: 5,
-      },
-    ],
-    escrowTransactions: [
-      {
-        id: "e1",
-        projectId: "p1",
-        amount: 500,
-        currency: "USD",
-        status: "released",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        milestoneId: "m1",
-      },
-    ],
-    invitations: [
-      {
-        id: "i1",
-        invitedBy: "client1",
-        consultantId: "c1",
-        method: "consultant",
-        status: "pending",
-        createdAt: new Date().toISOString(),
-      },
-    ],
-    teamMembers: [
-      {
-        id: "t1",
-        name: "Alice Cooper",
-        role: "Project Manager",
-        email: "alice@example.com",
-        addedAt: new Date().toISOString(),
-      },
-    ],
-    aiLogs: [
-      {
-        id: "log1",
-        actionType: "onboarding",
-        message: "AI assisted onboarding completed",
-        createdAt: new Date().toISOString(),
-      },
-    ],
+    avatar: "https://randomuser.me/api/portraits/black/72.jpg",
+    bio: "Tech enthusiast building solutions with AI and web automation.",
+    isPremium: true,
+    projects: [...teamProjects, ...individualProjects],
+    consultants: mockConsultants,
+    teamMembers: mockTeamMembers,
+    escrowTransactions: mockEscrowTransactions,
+    invitations: mockInvitations,
+    aiLogs: mockAiLogs,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
@@ -161,79 +190,17 @@ export const mockClients: ClientProfile[] = [
     email: "alice@example.com",
     companyname: "Example LLC",
     avatar: "https://randomuser.me/api/portraits/women/68.jpg",
-    balance: 13200.0,
-    notifications: [],
-    business: {
-      companyName: "Example LLC",
-      industry: "Finance",
-      location: "NYC",
-      size: "51-200",
-      website: "https://examplellc.com",
-    },
-    ai: { tone: "formal", automationLevel: "auto", aiAssistantEnabled: false },
-    projects: exampleProjects.slice(0, 2),
-    consultants: [
-      {
-        id: "c2",
-        name: "Bob Brown",
-        industry: "Finance",
-        delivery: "Onsite",
-        rate: "$60/hr",
-        rating: 4.5,
-        role: "Financial Consultant",
-      },
-    ],
+    isPremium: false,
+    projects: [...teamProjects, ...individualProjects],
+    consultants: mockConsultants,
+    teamMembers: mockTeamMembers,
     escrowTransactions: [],
     invitations: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: "client3",
-    username: "michaell",
-    name: "Michael Lee",
-    email: "michael@example.com",
-    companyname: "Innovatech",
-    avatar: "https://randomuser.me/api/portraits/men/45.jpg",
-    balance: 7850.5,
-    notifications: [
-      {
-        id: "n3",
-        type: "system",
-        message: "Your AI assistant was updated successfully.",
-        read: false,
-        createdAt: new Date().toISOString(),
-      },
-    ],
-    business: {
-      companyName: "Innovatech",
-      industry: "AI",
-      location: "San Francisco",
-      size: "200+",
-      website: "https://innovatech.ai",
-    },
-    ai: {
-      tone: "technical",
-      automationLevel: "manual",
-      aiAssistantEnabled: true,
-    },
-    projects: exampleProjects.slice(1),
-    consultants: [
-      {
-        id: "c3",
-        name: "Sara Kim",
-        industry: "AI",
-        delivery: "Remote",
-        rate: "$75/hr",
-        rating: 4.9,
-        role: "AI Specialist",
-      },
-    ],
-    escrowTransactions: [],
-    invitations: [],
+    aiLogs: [],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
 ];
 
+/* -------------------- ACTIVE CLIENT -------------------- */
 export const activeClient = mockClients[0];

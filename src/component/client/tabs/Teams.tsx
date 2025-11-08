@@ -192,7 +192,7 @@ export default function ClientTeamSettings({
           </li>
           <li>
             <span className="text-gray-400">Company:</span>{" "}
-            <span className="font-medium">{client.companyName}</span>
+            <span className="font-medium">{client.companyname}</span>
           </li>
           <li>
             <span className="text-gray-400">Industry:</span>{" "}

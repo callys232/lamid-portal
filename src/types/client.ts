@@ -133,4 +133,8 @@ export interface ClientProfile {
   bio?: string;
   isPremium?: boolean;
   avatar?: string;
+  location?: string;
+  industry?: string;
+  balance?: number;
+  notifications?: string[];
 }
