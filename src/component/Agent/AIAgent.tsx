@@ -40,16 +40,40 @@ interface ISpeechRecognition extends EventTarget {
   onresult: ((event: SpeechRecognitionEvent) => void) | null;
 }
 
+declare global {
+  interface SpeechRecognitionConstructor {
+    new (): ISpeechRecognition;
+  }
+  interface Window {
+    SpeechRecognition?: SpeechRecognitionConstructor;
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
+  }
+}
+
 export default function AIAgent() {
   const user: UserProfile = { name: "Caleb" };
 
-  // Load from localStorage
-  const loadFromLocal = () => {
-    const savedHistory = localStorage.getItem("lamid_ai_chat");
-    const savedAgent = localStorage.getItem("lamid_ai_agent");
+  // Load from localStorage safely
+  const loadFromLocal = (): { history: ChatMessage[]; agent: AgentType } => {
+    if (typeof window === "undefined") {
+      return { history: [], agent: "onboarding" };
+    }
+    const savedHistory = window.localStorage.getItem("lamid_ai_chat");
+    const savedAgent = window.localStorage.getItem("lamid_ai_agent");
+
+    const validAgent: AgentType =
+      savedAgent === "learning" ||
+      savedAgent === "support" ||
+      savedAgent === "shopping" ||
+      savedAgent === "creative" ||
+      savedAgent === "productivity" ||
+      savedAgent === "onboarding"
+        ? (savedAgent as AgentType)
+        : "onboarding";
+
     return {
       history: savedHistory ? JSON.parse(savedHistory) : [],
-      agent: (savedAgent as AgentType) || "onboarding",
+      agent: validAgent,
     };
   };
 
@@ -136,8 +160,9 @@ export default function AIAgent() {
 
   // Save + sync
   const saveToLocal = (history: ChatMessage[], agent: AgentType) => {
-    localStorage.setItem("lamid_ai_chat", JSON.stringify(history));
-    localStorage.setItem("lamid_ai_agent", agent);
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem("lamid_ai_chat", JSON.stringify(history));
+    window.localStorage.setItem("lamid_ai_agent", agent);
   };
 
   const syncWithBackend = async (history: ChatMessage[], agent: AgentType) => {
@@ -165,6 +190,8 @@ export default function AIAgent() {
 
   // Speech recognition setup
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const SpeechRecognitionConstructor =
       window.SpeechRecognition || window.webkitSpeechRecognition;
 
