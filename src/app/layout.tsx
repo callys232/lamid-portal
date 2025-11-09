@@ -1,9 +1,9 @@
-// src/app/layout.tsx
 import type { Metadata } from "next";
 import "./globals.css";
 import LayoutWrapper from "./LayoutWrapper";
 import { Toaster } from "react-hot-toast";
 import { inter, playfair } from "../fonts"; // our local fonts
+import AIAgent from "@/component/Agent/AIAgent"; // ✅ import the overlay component
 
 export const metadata: Metadata = {
   title: "Lamid Consulting",
@@ -27,6 +27,9 @@ export default function RootLayout({
 
         {/* Global Toast notifications */}
         <Toaster position="top-right" />
+
+        {/* Floating AI Agent trigger + sliding drawer */}
+        <AIAgent />
       </body>
     </html>
   );

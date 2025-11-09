@@ -39,3 +39,34 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+/* AI bubble tail */
+.ai-bubble {
+  position: relative;
+}
+.ai-bubble::after {
+  content: "";
+  position: absolute;
+  left: -8px;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-right: 8px solid rgba(31, 41, 55, 0.7); /* matches bg-gray-800/70 */
+  border-bottom: 0 solid transparent;
+}
+
+/* User bubble tail */
+.user-bubble {
+  position: relative;
+}
+.user-bubble::after {
+  content: "";
+  position: absolute;
+  right: -8px;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-left: 8px solid #c21219; /* matches Lamid red gradient */
+  border-bottom: 0 solid transparent;
+}
