@@ -3,7 +3,7 @@ import "./globals.css";
 import LayoutWrapper from "./LayoutWrapper";
 import { Toaster } from "react-hot-toast";
 import { inter, playfair } from "../fonts"; // our local fonts
-import AIAgent from "@/component/Agent/AIAgent"; // ✅ import the overlay component
+import AIAgent from "@/component/Agent/Onboarding"; // ✅ import the overlay component
 
 export const metadata: Metadata = {
   title: "Lamid Consulting",

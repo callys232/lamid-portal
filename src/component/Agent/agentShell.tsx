@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import OnboardingAgent from "./onboardingAgent";
-import ProjectAgent from "./projectAgent";
+import OnboardingAgent from "./Onboarding";
+import ProjectAgent from "./project/projectAgent";
 import CommunicationAgent from "./communicationAgent";
 import AnalyticsAgent from "./analyticsAgent";
 import OutreachAgent from "./OutreachAgent";

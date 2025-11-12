@@ -7,6 +7,7 @@ import LockedMessage from "./lockedMessage";
 import { useRouter } from "next/navigation";
 import type { AgentType } from "@/types/agentTypes";
 import { checkReferral } from "./checker";
+import AgentSwitcher from "./agentSwitcher";
 
 interface UserProfile {
   name: string;
@@ -296,49 +297,7 @@ export default function AIAgent() {
                 <div ref={chatEndRef} />
 
                 {activeAgent === "onboarding" && (
-                  <div className="mt-6 bg-[#1a1a1a] p-5 rounded-lg border border-[#374151]">
-                    <h4 className="text-white font-semibold mb-3">
-                      🔀 Switch Agents
-                    </h4>
-                    <div className="grid grid-cols-2 gap-3">
-                      <button
-                        onClick={() => handleSwitchAgent("learning")}
-                        className="px-4 py-2 bg-[#3b82f6] text-white rounded hover:opacity-90"
-                      >
-                        📘 Learning
-                      </button>
-                      <button
-                        onClick={() => handleSwitchAgent("support")}
-                        className="px-4 py-2 bg-[#ef4444] text-white rounded hover:opacity-90"
-                      >
-                        🛠️ Support
-                      </button>
-                      <button
-                        onClick={() => handleSwitchAgent("shopping")}
-                        className="px-4 py-2 bg-[#22c55e] text-white rounded hover:opacity-90"
-                      >
-                        🛒 Shopping
-                      </button>
-                      <button
-                        onClick={() => handleSwitchAgent("creative")}
-                        className="px-4 py-2 bg-[#a855f7] text-white rounded hover:opacity-90"
-                      >
-                        🎨 Creative
-                      </button>
-                      <button
-                        onClick={() => handleSwitchAgent("productivity")}
-                        className="px-4 py-2 bg-[#f59e0b] text-white rounded hover:opacity-90"
-                      >
-                        ⏰ Productivity
-                      </button>
-                      <button
-                        onClick={() => handleSwitchAgent("project")}
-                        className="px-4 py-2 bg-[#0ea5e9] text-white rounded hover:opacity-90"
-                      >
-                        📂 Project
-                      </button>
-                    </div>
-                  </div>
+                  <AgentSwitcher onSwitch={handleSwitchAgent} />
                 )}
               </>
             )}
