@@ -1,56 +1,49 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import FilterSidebar, { FilterOption } from "../consultants/FilterSidebar";
 import ProjectCard from "./projectCard";
+import { teamProjects, individualProjects } from "@/mocks/mockClient";
+import type { Project } from "@/types/project";
 
-/* Raw API project type */
-interface RawProject {
-  _id?: string;
-  id?: string;
-  title: string;
+/* -------------------- FILTER TYPE -------------------- */
+type ProjectFilters = {
+  search: string;
   category: string;
   tech: string;
   location: string;
-  budget?: string | number;
-  organization?: string;
-  image?: string;
-}
+  budget: string;
+};
 
-/* Normalized project type for frontend */
-interface Project {
-  _id?: string; // DB id support
-  id?: string; // local id support
-  title: string;
-  category: string;
-  tech: string;
-  location: string;
-  budget?: string; // string to match ProjectCard
-  organization?: string;
-  image?: string;
-}
+/* -------------------- DEFAULT FILTERS -------------------- */
+const defaultFilters: ProjectFilters = {
+  search: "",
+  category: "All",
+  tech: "All",
+  location: "All",
+  budget: "All",
+};
 
-export default function ProjectDiscoverySection() {
+export default function ProjectsSection({
+  showSidebar,
+}: {
+  showSidebar: boolean;
+}) {
+  const [filters, setFilters] = useState<ProjectFilters>(defaultFilters);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  const [categoryFilter, setCategoryFilter] = useState("All");
-  const [techFilter, setTechFilter] = useState("All");
-  const [locationFilter, setLocationFilter] = useState("All");
-  const [budgetFilter, setBudgetFilter] = useState("All");
-  const [activeTab, setActiveTab] = useState<"all" | "saved">("all");
-  const [savedIds, setSavedIds] = useState<string[]>([]);
-  const [showFilters, setShowFilters] = useState(false);
-
-  // ✅ Fetch projects from backend and normalize
+  /* -------------------- FETCH PROJECTS -------------------- */
   useEffect(() => {
     async function fetchProjects() {
       try {
         const res = await fetch("/api/projects");
         const data = await res.json();
+
         if (!data.success) throw new Error(data.message);
 
-        const normalizedProjects: Project[] = (data.data as RawProject[]).map(
+        const normalizedProjects: Project[] = (data.data as Project[]).map(
           (p) => ({
             ...p,
             _id: p._id || p.id,
@@ -60,280 +53,155 @@ export default function ProjectDiscoverySection() {
         );
 
         setProjects(normalizedProjects);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to load projects"
-        );
+      } catch {
+        const mockProjects: Project[] = [
+          ...teamProjects,
+          ...individualProjects,
+        ].map((p) => ({
+          ...p,
+          _id: p._id || p.id,
+          id: p.id || p._id,
+        }));
+        setProjects(mockProjects);
       } finally {
         setLoading(false);
       }
     }
+
     fetchProjects();
   }, []);
 
-  // ✅ Load saved IDs safely
-  useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("savedProjects") || "[]");
-    setSavedIds(saved);
-  }, []);
-
+  /* -------------------- FILTER OPTIONS -------------------- */
   const categories = useMemo(
-    () => ["All", ...new Set(projects.map((p) => p.category))],
+    () => [
+      "All",
+      ...new Set(
+        projects.map((p) => p.category).filter((c): c is string => !!c)
+      ),
+    ],
     [projects]
   );
 
   const techs = useMemo(
-    () => ["All", ...new Set(projects.map((p) => p.tech))],
+    () => [
+      "All",
+      ...new Set(projects.map((p) => p.tech).filter((t): t is string => !!t)),
+    ],
     [projects]
   );
 
+  const locations = useMemo(
+    () => [
+      "All",
+      ...new Set(
+        projects.map((p) => p.location).filter((l): l is string => !!l)
+      ),
+    ],
+    [projects]
+  );
+
+  /* -------------------- FILTERING LOGIC -------------------- */
   const filteredProjects = useMemo(() => {
+    const isDefault =
+      JSON.stringify(filters) === JSON.stringify(defaultFilters);
+    if (isDefault) return projects;
+
+    const term = filters.search.toLowerCase();
     return projects.filter((p) => {
+      const matchesSearch =
+        p.title.toLowerCase().includes(term) ||
+        p.category.toLowerCase().includes(term) ||
+        (p.tech?.toLowerCase().includes(term) ?? false) ||
+        (p.organization?.toLowerCase().includes(term) ?? false);
+
       const matchesCategory =
-        categoryFilter === "All" || p.category === categoryFilter;
-      const matchesTech = techFilter === "All" || p.tech === techFilter;
+        filters.category === "All" || p.category === filters.category;
+      const matchesTech = filters.tech === "All" || p.tech === filters.tech;
       const matchesLocation =
-        locationFilter === "All" || p.location === locationFilter;
+        filters.location === "All" || p.location === filters.location;
       const matchesBudget =
-        budgetFilter === "All" || Number(p.budget) <= Number(budgetFilter);
+        filters.budget === "All" || Number(p.budget) <= Number(filters.budget);
 
-      return matchesCategory && matchesTech && matchesLocation && matchesBudget;
+      return (
+        matchesSearch &&
+        matchesCategory &&
+        matchesTech &&
+        matchesLocation &&
+        matchesBudget
+      );
     });
-  }, [projects, categoryFilter, techFilter, locationFilter, budgetFilter]);
+  }, [projects, filters]);
 
-  const savedProjects = useMemo(() => {
-    return projects.filter((p) => savedIds.includes(p._id || ""));
-  }, [projects, savedIds]);
+  /* -------------------- FILTER CONFIG -------------------- */
+  const filterConfig: FilterOption<ProjectFilters>[] = [
+    { label: "Category", key: "category", options: categories },
+    { label: "Technology", key: "tech", options: techs },
+    { label: "Location", key: "location", options: locations },
+    {
+      label: "Budget",
+      key: "budget",
+      options: ["All", "2000", "3000", "5000"],
+    },
+  ];
 
-  const clearFilters = () => {
-    setCategoryFilter("All");
-    setTechFilter("All");
-    setLocationFilter("All");
-    setBudgetFilter("All");
-  };
-
-  if (loading)
+  /* -------------------- RENDER -------------------- */
+  if (loading) {
     return (
       <p className="text-center text-gray-400 py-20 text-lg">
         Loading projects...
       </p>
     );
-
-  if (error)
-    return <p className="text-center text-red-600 py-20 text-lg">{error}</p>;
+  }
 
   return (
-    <section className="bg-[#0c0000] text-white py-16 px-4 sm:px-6 lg:px-16 font-sans">
-      <div className="max-w-7xl mx-auto">
-        {/* Tabs */}
-        <div className="flex gap-4 mb-8">
-          <button
-            onClick={() => setActiveTab("all")}
-            className={`px-6 py-2 rounded-md font-semibold transition ${
-              activeTab === "all"
-                ? "bg-red-600"
-                : "bg-[#1a0d0d] border border-[#a71414]"
-            }`}
-          >
-            All Projects
-          </button>
+    <>
+      {showSidebar && (
+        <aside className="lg:col-span-1">
+          <FilterSidebar<ProjectFilters>
+            activeTab="projects"
+            filters={filters}
+            setFilters={setFilters}
+            filterConfigs={filterConfig}
+            showClearButton={
+              JSON.stringify(filters) !== JSON.stringify(defaultFilters)
+            }
+            handleClearFilters={() => setFilters(defaultFilters)}
+          />
+        </aside>
+      )}
 
-          <button
-            onClick={() => setActiveTab("saved")}
-            className={`px-6 py-2 rounded-md font-semibold transition ${
-              activeTab === "saved"
-                ? "bg-red-600"
-                : "bg-[#1a0d0d] border border-[#a71414]"
-            }`}
+      <main className={showSidebar ? "lg:col-span-3" : "lg:col-span-4"}>
+        <h2 className="text-2xl font-bold mb-6">Projects</h2>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key="projects"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.2 }}
           >
-            Saved
-            {savedProjects.length > 0 && (
-              <span className="ml-2 bg-red-600 px-2 py-[1px] rounded-full text-xs">
-                {savedProjects.length}
-              </span>
+            {filteredProjects.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                {filteredProjects.map((p) => (
+                  <motion.div key={p.id} layout>
+                    <ProjectCard project={p} />
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center text-gray-400 mt-10">
+                <p>No projects found matching your filters.</p>
+                <button
+                  onClick={() => setFilters(defaultFilters)}
+                  className="mt-4 bg-red-600 px-4 py-2 rounded-md font-semibold"
+                >
+                  Clear Filters
+                </button>
+              </div>
             )}
-          </button>
-
-          {activeTab === "all" && (
-            <button
-              onClick={() => setShowFilters(true)}
-              className="lg:hidden ml-auto bg-red-600 text-sm px-4 py-2 rounded-md"
-            >
-              Filters
-            </button>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
-          {/* Sidebar Filters */}
-          {activeTab === "all" && (
-            <>
-              <aside className="hidden lg:block lg:col-span-1 space-y-6 bg-[#120202] p-5 rounded-2xl border">
-                <FilterControls
-                  categoryFilter={categoryFilter}
-                  setCategoryFilter={setCategoryFilter}
-                  techFilter={techFilter}
-                  setTechFilter={setTechFilter}
-                  locationFilter={locationFilter}
-                  setLocationFilter={setLocationFilter}
-                  budgetFilter={budgetFilter}
-                  setBudgetFilter={setBudgetFilter}
-                  clearFilters={clearFilters}
-                  categories={categories}
-                  techs={techs}
-                />
-              </aside>
-
-              {/* Mobile Filter Drawer */}
-              {showFilters && (
-                <div className="fixed inset-0 bg-black/70 z-40 flex">
-                  <div className="bg-[#120202] w-80 p-6 overflow-y-auto">
-                    <div className="flex justify-between mb-6">
-                      <h3 className="text-xl font-bold">Filters</h3>
-                      <button
-                        onClick={() => setShowFilters(false)}
-                        className="text-gray-400"
-                      >
-                        ✕
-                      </button>
-                    </div>
-
-                    <FilterControls
-                      categoryFilter={categoryFilter}
-                      setCategoryFilter={setCategoryFilter}
-                      techFilter={techFilter}
-                      setTechFilter={setTechFilter}
-                      locationFilter={locationFilter}
-                      setLocationFilter={setLocationFilter}
-                      budgetFilter={budgetFilter}
-                      setBudgetFilter={setBudgetFilter}
-                      clearFilters={clearFilters}
-                      categories={categories}
-                      techs={techs}
-                    />
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-
-          {/* Main */}
-          <main
-            className={`${
-              activeTab === "all" ? "lg:col-span-3" : "lg:col-span-4"
-            }`}
-          >
-            <h2 className="text-2xl font-bold mb-6">
-              {activeTab === "all" ? "Project Discovery" : "Saved Projects"}
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {(activeTab === "all" ? filteredProjects : savedProjects).map(
-                (project) => (
-                  <ProjectCard
-                    key={project._id || project.id}
-                    project={project}
-                  />
-                )
-              )}
-            </div>
-
-            {(activeTab === "all"
-              ? filteredProjects.length === 0
-              : savedProjects.length === 0) && (
-              <p className="text-center text-gray-400 mt-10">
-                No projects found.
-              </p>
-            )}
-          </main>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* Filters Component */
-interface FilterProps {
-  categoryFilter: string;
-  setCategoryFilter: (v: string) => void;
-  techFilter: string;
-  setTechFilter: (v: string) => void;
-  locationFilter: string;
-  setLocationFilter: (v: string) => void;
-  budgetFilter: string;
-  setBudgetFilter: (v: string) => void;
-  clearFilters: () => void;
-  categories: string[];
-  techs: string[];
-}
-
-function FilterControls({
-  categoryFilter,
-  setCategoryFilter,
-  techFilter,
-  setTechFilter,
-  locationFilter,
-  setLocationFilter,
-  budgetFilter,
-  setBudgetFilter,
-  clearFilters,
-  categories,
-  techs,
-}: FilterProps) {
-  return (
-    <div className="space-y-5">
-      <select
-        aria-label="Filter by category"
-        value={categoryFilter}
-        onChange={(e) => setCategoryFilter(e.target.value)}
-        className="w-full bg-[#1a0d0d] border px-3 py-2 rounded-md"
-      >
-        {categories.map((c) => (
-          <option key={c}>{c}</option>
-        ))}
-      </select>
-
-      <select
-        aria-label="Filter by technology"
-        value={techFilter}
-        onChange={(e) => setTechFilter(e.target.value)}
-        className="w-full bg-[#1a0d0d] border px-3 py-2 rounded-md"
-      >
-        {techs.map((t) => (
-          <option key={t}>{t}</option>
-        ))}
-      </select>
-
-      <select
-        aria-label="Filter by location"
-        value={locationFilter}
-        onChange={(e) => setLocationFilter(e.target.value)}
-        className="w-full bg-[#1a0d0d] border px-3 py-2 rounded-md"
-      >
-        <option>All</option>
-        <option>Remote</option>
-        <option>On-site</option>
-        <option>Hybrid</option>
-      </select>
-
-      <select
-        aria-label="Filter by budget"
-        value={budgetFilter}
-        onChange={(e) => setBudgetFilter(e.target.value)}
-        className="w-full bg-[#1a0d0d] border px-3 py-2 rounded-md"
-      >
-        <option value="All">All Budgets</option>
-        <option value="2000">Under $2000</option>
-        <option value="3000">Under $3000</option>
-        <option value="5000">Under $5000</option>
-      </select>
-
-      <button
-        onClick={clearFilters}
-        className="w-full bg-red-600 py-2 rounded-md font-semibold"
-      >
-        Clear Filters
-      </button>
-    </div>
+          </motion.div>
+        </AnimatePresence>
+      </main>
+    </>
   );
 }

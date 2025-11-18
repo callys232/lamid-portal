@@ -140,6 +140,14 @@ export default function Navbar() {
                     </Link>
                   </li>
                   <li>
+                    <Link
+                      href="/admin"
+                      className="block px-4 py-2 hover:bg-[#c12129] hover:text-white"
+                    >
+                      Admin
+                    </Link>
+                  </li>
+                  <li>
                     <button className="px-4 py-2 w-full text-left hover:bg-[#c12129] hover:text-white">
                       Continue with Google
                     </button>
@@ -257,6 +265,12 @@ export default function Navbar() {
               className="block bg-black px-4 py-2 rounded-lg hover:bg-[#c12129]"
             >
               Client Login
+            </Link>
+            <Link
+              href="/admin"
+              className="block bg-black px-4 py-2 rounded-lg hover:bg-[#c12129]"
+            >
+              Admin
             </Link>
             <button className="w-full bg-[#c12129] py-2 rounded-lg hover:bg-red-700">
               Continue with Google

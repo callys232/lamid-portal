@@ -1,4 +1,4 @@
-import Consultants from "@/component/consultants/consultancyMatching";
+import Consultants from "@/component/talent/consultProject";
 
 const TalentPage = () => {
   return (

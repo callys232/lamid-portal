@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import ProjectModal from "./projectModal";
-import { Project } from "./projectData";
+import { Project } from "@/types/project";
 
 interface ProjectCardProps {
   project: Project;

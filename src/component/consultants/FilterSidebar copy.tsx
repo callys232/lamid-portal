@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search } from "lucide-react";
 
+// Generic filter option type
 export interface FilterOption<T extends { search: string }> {
   label: string;
   key: keyof T;
@@ -58,12 +60,12 @@ export default function FilterSidebar<T extends { search: string }>({
         <div key={String(key)}>
           <label className="text-sm text-gray-400">{label}</label>
           <select
-            aria-label={`Filter by ${label}`}
+            aria-label="filter"
             value={filters[key] as string}
             onChange={(e) =>
               setFilters({ ...filters, [key]: e.target.value } as T)
             }
-            className="w-full bg-[#010101] border border-[#a71414] text-gray-100 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#d31c1c]"
+            className="w-full bg-[#010101] border border-[#a71414] text-gray-100 px-3 py-2 rounded-md focus:outline-none"
           >
             {options.map((opt) => (
               <option key={opt} value={opt}>

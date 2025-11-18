@@ -9,12 +9,13 @@ export interface Consultant {
   name: string;
   industry: string;
   delivery: string;
-  rate: string;
+  rate: string | number;
   rating: number;
   image?: string;
   experience?: number;
   role: string;
   email?: string;
+  skills?: string;
 
   // ✅ Consultants can have their own projects
   projects?: Project[];
@@ -136,5 +137,46 @@ export interface ClientProfile {
   location?: string;
   industry?: string;
   balance?: number;
-  notifications?: string[];
+  alerts?: Alert[];
+  notifications?: Notification[];
+}
+
+export interface Alert {
+  id: string;
+  type:
+    | "Broadcast"
+    | "escrow"
+    | "payment"
+    | "milestone"
+    | "message"
+    | "Email"
+    | "Slack"
+    | "Sms"
+    | "Risk"
+    | "document"
+    | "complaint";
+  message: string;
+
+  channel?: string;
+  severity?: "Low" | "Medium" | "High";
+  createdAt?: string;
+}
+
+export interface Notification {
+  id: string;
+  message: string;
+  createdAt?: string;
+  type:
+    | "Broadcast"
+    | "escrow"
+    | "payment"
+    | "milestone"
+    | "message"
+    | "Email"
+    | "Slack"
+    | "Sms"
+    | "Risk"
+    | "document"
+    | "complaint";
+  severity?: "Low" | "Medium" | "High";
 }

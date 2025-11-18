@@ -2,14 +2,14 @@
 
 import { Star } from "lucide-react";
 import Image from "next/image";
-import type { Consultant } from "./consultantData";
+import type { Consultant } from "@/types/client";
 
 interface ConsultantCardProps {
   consultant: Consultant;
 }
 
 export default function ConsultantCard({ consultant }: ConsultantCardProps) {
-  const { name, image, industry, delivery, rate, rating, experience } =
+  const { name, image, industry, delivery, rate, rating, experience, role } =
     consultant;
 
   const renderStars = (rating: number) =>
@@ -17,7 +17,9 @@ export default function ConsultantCard({ consultant }: ConsultantCardProps) {
       <Star
         key={i}
         className={`w-4 h-4 ${
-          i < rating ? "text-red-500 fill-red-500" : "text-gray-600"
+          i + 1 <= Math.round(rating)
+            ? "text-red-500 fill-red-500"
+            : "text-gray-600"
         }`}
       />
     ));
@@ -39,9 +41,14 @@ export default function ConsultantCard({ consultant }: ConsultantCardProps) {
           )}
         </div>
         <h3 className="text-lg font-semibold text-white mt-3">{name}</h3>
-        <p className="text-xs text-gray-400 -mt-1 mb-1 lowercase">{name}</p>
+        <p className="text-xs text-gray-400 -mt-1 mb-1">{role}</p>
 
-        <div className="flex justify-center mb-2">{renderStars(rating)}</div>
+        <div
+          className="flex justify-center mb-2"
+          aria-label={`Rating: ${rating} out of 5`}
+        >
+          {renderStars(rating)}
+        </div>
       </div>
 
       {/* Info */}
@@ -55,15 +62,21 @@ export default function ConsultantCard({ consultant }: ConsultantCardProps) {
 
       {/* Rate */}
       <div className="text-center mb-4">
-        <p className="text-red-500 font-semibold text-sm">{rate}/hr</p>
+        <p className="text-red-500 font-semibold text-sm">${rate}/hr</p>
       </div>
 
       {/* Buttons */}
       <div className="flex justify-center gap-3 mt-auto">
-        <button className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded-md transition-all">
+        <button
+          type="button"
+          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded-md transition-all"
+        >
           View Team
         </button>
-        <button className="px-4 py-2 border border-red-600 text-red-400 hover:bg-red-800 hover:text-white text-xs font-medium rounded-md transition-all">
+        <button
+          type="button"
+          className="px-4 py-2 border border-red-600 text-red-400 hover:bg-red-800 hover:text-white text-xs font-medium rounded-md transition-all"
+        >
           Use Team
         </button>
       </div>
