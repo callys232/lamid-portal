@@ -2,51 +2,40 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import { Project } from "@/types/project"; // ✅ single source of truth
 
-export interface ProjectOverviewProps {
-  id: string;
-  title: string;
-  organization: string;
-  location: string;
-  category: string;
-  rating: number;
-  image: string;
-  budget: number | string;
-  hourlyRate: string;
-  tech: string;
-  timeline: string;
-  milestones: string[];
-  skills: string[];
-  escrow: {
-    date: string;
-    type: string;
-    amount: number;
-    status: string;
-    action: string;
-  }[];
-}
+export default function ProjectOverview({ project }: { project: Project }) {
+  const {
+    id,
+    title,
+    organization,
+    location,
+    category,
+    rating = 0,
+    image,
+    images,
+    budget,
+    hourlyRate,
+    tech,
+    timeline,
+    milestones = [],
+    skills = [],
+    escrow = [],
+    suggestedBidRange,
+    consultants = [],
+    priority,
+    deadline,
+    status,
+    teamId,
+    ownerId,
+    milestoneProgress,
+  } = project;
 
-export default function ProjectOverview({
-  id,
-  title,
-  organization,
-  location,
-  category,
-  rating,
-  image,
-  budget,
-  hourlyRate,
-  tech,
-  timeline,
-  milestones = [],
-  skills = [],
-  escrow = [],
-}: ProjectOverviewProps) {
   const [activeTab, setActiveTab] = useState<
     "milestones" | "skills" | "escrow"
   >("milestones");
 
-  const fallbackImage = "/images/default-project.jpg"; // replace with your default image path
+  const fallbackImage = "/images/default-project.jpg";
 
   return (
     <div className="bg-[#1a0d0d] border border-[#3a1919] rounded-xl p-6 text-gray-200 space-y-6">
@@ -71,6 +60,22 @@ export default function ProjectOverview({
         </div>
       </div>
 
+      {/* Extra Images */}
+      {images && (
+        <div className="flex gap-2 mt-2">
+          {images.split(",").map((img, i) => (
+            <Image
+              key={i}
+              src={img}
+              alt={`Project image ${i + 1}`}
+              width={60}
+              height={60}
+              className="rounded object-cover"
+            />
+          ))}
+        </div>
+      )}
+
       {/* Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
@@ -93,7 +98,63 @@ export default function ProjectOverview({
           <p className="text-sm text-gray-400">Project ID</p>
           <p className="text-lg text-white">{id}</p>
         </div>
+        {priority && (
+          <div>
+            <p className="text-sm text-gray-400">Priority</p>
+            <p className="text-lg text-white">{priority}</p>
+          </div>
+        )}
+        {deadline && (
+          <div>
+            <p className="text-sm text-gray-400">Deadline</p>
+            <p className="text-lg text-white">{deadline}</p>
+          </div>
+        )}
+        {status && (
+          <div>
+            <p className="text-sm text-gray-400">Status</p>
+            <p className="text-lg text-white">{status}</p>
+          </div>
+        )}
+        {suggestedBidRange && (
+          <div>
+            <p className="text-sm text-gray-400">Suggested Bid Range</p>
+            <p className="text-lg text-white">
+              ${suggestedBidRange.min} – ${suggestedBidRange.max}
+            </p>
+          </div>
+        )}
+        {milestoneProgress !== undefined && (
+          <div>
+            <p className="text-sm text-gray-400">Milestone Progress</p>
+            <p className="text-lg text-white">{milestoneProgress}%</p>
+          </div>
+        )}
+        {teamId && (
+          <div>
+            <p className="text-sm text-gray-400">Team ID</p>
+            <p className="text-lg text-white">{teamId}</p>
+          </div>
+        )}
+        {ownerId && (
+          <div>
+            <p className="text-sm text-gray-400">Owner ID</p>
+            <p className="text-lg text-white">{ownerId}</p>
+          </div>
+        )}
       </div>
+
+      {/* Consultants */}
+      {consultants.length > 0 && (
+        <div className="mt-4">
+          <h3 className="text-sm font-semibold text-white">Consultants</h3>
+          <ul className="list-disc pl-6 text-gray-300">
+            {consultants.map((c, i) => (
+              <li key={i}>{typeof c === "string" ? c : c.name}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="flex gap-4 mt-6">
@@ -118,7 +179,7 @@ export default function ProjectOverview({
           (milestones.length > 0 ? (
             <ul className="list-disc pl-6 space-y-2 text-gray-300">
               {milestones.map((m, i) => (
-                <li key={i}>{m}</li>
+                <li key={i}>{m.title}</li>
               ))}
             </ul>
           ) : (
@@ -147,23 +208,22 @@ export default function ProjectOverview({
               <thead>
                 <tr>
                   <th>Date</th>
-                  <th>Type</th>
                   <th>Amount</th>
+                  <th>Currency</th>
                   <th>Status</th>
-                  <th>Action</th>
+                  <th>Milestone</th>
                 </tr>
               </thead>
               <tbody>
                 {escrow.map((tx, i) => (
                   <tr key={i}>
-                    <td>{tx.date}</td>
-                    <td>{tx.type}</td>
+                    <td>{new Date(tx.createdAt).toLocaleDateString()}</td>
                     <td>${tx.amount.toLocaleString()}</td>
+                    <td>{tx.currency}</td>
                     <td>{tx.status}</td>
                     <td>
-                      <button className="text-blue-500 hover:underline">
-                        {tx.action}
-                      </button>
+                      {milestones.find((m) => m.id === tx.milestoneId)?.title ||
+                        "—"}
                     </td>
                   </tr>
                 ))}

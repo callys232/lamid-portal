@@ -1,99 +1,162 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, Variants } from "framer-motion";
-import { Project, Milestone, MilestoneStatus } from "@/types/project";
+import { useEffect, useState, useMemo } from "react";
+import { motion } from "framer-motion";
+
+import { Project, Milestone } from "@/types/project";
+import { ClientProfile, TeamMember } from "@/types/client";
+import { mockClients } from "@/mocks/mockClient";
+
 import { MilestoneItem } from "./MilestoneItem";
 import { MemberItem } from "./Member";
 import { AlertItem } from "./Alert";
 
-// Animation Variants
-const container: Variants = {
+/* -------------------- ANIMATION VARIANTS -------------------- */
+const container = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.2, delayChildren: 0.2 },
+    transition: { staggerChildren: 0.12 },
   },
 };
 
-const item: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] },
-  },
+const item = {
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0 },
 };
 
-const completedVariant: Variants = {
-  hidden: { opacity: 0, scale: 0.95 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] },
-  },
-};
-
-const pendingVariant: Variants = {
-  hidden: { opacity: 0, x: 40 },
+const completedVariant = {
+  hidden: { opacity: 0, x: -10 },
   visible: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] },
+    transition: { duration: 0.3 },
   },
 };
 
-// Map MilestoneStatus to AlertItem type
+const pendingVariant = {
+  hidden: { opacity: 0, x: 10 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.3 },
+  },
+};
+
+/* -------------------- MAP STATUS TO ALERT TYPE -------------------- */
 function statusToAlertType(
-  status?: MilestoneStatus
-): "overdue" | "success" | "upcoming" | "payment" {
-  if (status === "completed") return "success";
-  if (
-    status === "pending" ||
-    status === "in_progress" ||
-    status === "funded" ||
-    status === "released"
-  )
-    return "upcoming";
-  if (status === "cancelled" || status === "disputed") return "overdue";
-  return "upcoming";
+  status: string
+): "success" | "overdue" | "upcoming" | "payment" {
+  switch (status) {
+    case "completed":
+      return "success";
+    case "cancelled":
+      return "overdue";
+    case "in_progress":
+      return "payment";
+    default:
+      return "upcoming";
+  }
 }
 
 export default function Teams() {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [activeProject, setActiveProject] = useState<Project | null>(null);
+
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
+  /* -------------------- LOAD TEAM + PROJECTS -------------------- */
   useEffect(() => {
-    async function loadProjects() {
+    async function loadTeamData() {
       try {
-        const res = await fetch("/api/teams/t1/projects");
-        const { data } = await res.json();
-        setProjects(data as Project[]);
-        if (data.length > 0) setActiveProject(data[0]);
+        const res = await fetch("/api/teams/t1");
+
+        if (res.ok) {
+          const { data } = await res.json();
+
+          const backendProjects: Project[] = (data.projects ?? []).map(
+            (p: Project) => ({ ...p, id: p._id || p.id })
+          );
+
+          const backendMembers: TeamMember[] = data.teamMembers ?? [];
+
+          setProjects(backendProjects);
+          setTeamMembers(backendMembers);
+
+          if (backendProjects.length) {
+            setActiveProject(backendProjects[0]);
+          }
+
+          setLoading(false);
+          return;
+        }
+
+        throw new Error("Backend not ok");
       } catch (err) {
-        console.error("Failed to load projects", err);
+        console.warn("⚠ Backend failed → using fallback mock data.");
+        setError("Unable to fetch team data. Showing fallback.");
+
+        const fallbackClient: ClientProfile = mockClients[0];
+
+        const fallbackProjects = (fallbackClient.projects ?? [])
+          .filter((p) => p.teamId === "team1")
+          .map((p) => ({ ...p, id: p._id || p.id }));
+
+        setProjects(fallbackProjects);
+        setTeamMembers(fallbackClient.teamMembers ?? []);
+
+        if (fallbackProjects.length) {
+          setActiveProject(fallbackProjects[0]);
+        }
       } finally {
         setLoading(false);
       }
     }
-    loadProjects();
+
+    loadTeamData();
   }, []);
 
-  const filteredProjects = projects.filter((p) =>
-    p.title.toLowerCase().includes(search.toLowerCase())
+  /* -------------------- FILTERED PROJECTS -------------------- */
+  const filteredProjects = useMemo(
+    () =>
+      projects.filter((p) =>
+        p.title.toLowerCase().includes(search.toLowerCase())
+      ),
+    [projects, search]
   );
 
-  if (loading)
-    return <div className="p-6 text-gray-400">Loading projects...</div>;
-  if (!activeProject)
-    return (
-      <div className="p-6 text-gray-400">
-        No projects available for your team.
-      </div>
-    );
+  /* -------------------- LOADING STATES -------------------- */
+  if (loading) {
+    return <div className="p-6 text-gray-400">Loading team data…</div>;
+  }
 
+  if (!activeProject) {
+    return (
+      <div className="p-6 text-gray-400">No projects found for your team.</div>
+    );
+  }
+
+  /* -------------------- COMPUTE MILESTONE STATS -------------------- */
+  const milestoneStats = activeProject.milestones
+    ? {
+        total: activeProject.milestones.length,
+        completed: activeProject.milestones.filter(
+          (m) => m.status === "completed"
+        ).length,
+        pending: activeProject.milestones.filter(
+          (m) => m.status === "pending" || m.status === "in_progress"
+        ).length,
+        overdue: activeProject.milestones.filter((m) => {
+          if (!m.dueDate) return false;
+          return new Date(m.dueDate) < new Date() && m.status !== "completed";
+        }).length,
+      }
+    : { total: 0, completed: 0, pending: 0, overdue: 0 };
+
+  /* -------------------- UI -------------------- */
   return (
     <motion.div
       className="flex flex-col md:flex-row gap-6 w-full"
@@ -101,73 +164,55 @@ export default function Teams() {
       initial="hidden"
       animate="visible"
     >
-      {/* LEFT SIDEBAR */}
+      {/* LEFT SIDEBAR — PROJECT LIST */}
       <motion.aside
         variants={item}
-        className="w-full md:w-64 bg-gradient-to-b from-gray-900 to-gray-800 
-                   border border-gray-700 rounded-xl p-6 flex flex-col justify-between 
-                   shadow-lg ring-1 ring-gray-700"
+        className="w-full md:w-64 bg-gray-900 border border-gray-700 rounded-xl p-6"
       >
-        <div>
-          <h2 className="text-xl font-bold text-white mb-4 tracking-wide">
-            Team Projects
-          </h2>
-          <label htmlFor="project-search" className="sr-only">
-            Search projects
-          </label>
-          <input
-            id="project-search"
-            type="text"
-            placeholder="🔍 Search projects..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full mb-4 rounded-md border border-gray-600 bg-gray-800 
-                       text-white px-3 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none"
-          />
-          <ul className="space-y-2 overflow-y-auto max-h-[60vh]">
-            {filteredProjects.map((proj) => (
-              <li
-                key={proj._id || proj.id}
+        <h2 className="text-xl font-bold text-white mb-4">Team Projects</h2>
+
+        <input
+          type="text"
+          placeholder="Search projects..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full mb-4 rounded-md border bg-gray-800 text-white px-3 py-2"
+        />
+
+        <ul className="space-y-2 max-h-[60vh] overflow-y-auto">
+          {filteredProjects.map((proj) => (
+            <li key={proj.id}>
+              <button
                 onClick={() => setActiveProject(proj)}
-                aria-current={
-                  activeProject?._id === proj._id ? "true" : undefined
-                }
-                className={`px-3 py-2 rounded-md cursor-pointer transition ${
-                  activeProject?._id === proj._id
-                    ? "bg-red-600 text-white shadow-md ring-2 ring-red-400"
-                    : "bg-gray-800 hover:bg-gray-700 text-gray-300"
+                className={`w-full text-left px-3 py-2 rounded-md ${
+                  activeProject?.id === proj.id
+                    ? "bg-red-600 text-white"
+                    : "bg-gray-800 text-gray-300 hover:bg-gray-700"
                 }`}
               >
                 📁 {proj.title}
-              </li>
-            ))}
-            {filteredProjects.length === 0 && (
-              <li className="text-sm text-gray-400">No projects found</li>
-            )}
-          </ul>
-        </div>
-        <button
-          className="mt-6 px-4 py-2 rounded-md bg-red-600 text-white 
-                           hover:bg-red-700 shadow-md transition transform hover:scale-105"
-        >
-          ✨ Invite Members & Templates
-        </button>
+              </button>
+            </li>
+          ))}
+        </ul>
       </motion.aside>
 
-      {/* MIDDLE PANEL */}
+      {/* MAIN PANEL */}
       <motion.main
         variants={item}
-        className="flex-1 bg-gradient-to-b from-gray-900 to-gray-800 
-                   border border-gray-700 rounded-xl p-8 space-y-8 shadow-lg ring-1 ring-gray-700"
+        className="flex-1 bg-gray-900 border border-gray-700 rounded-xl p-8 space-y-8"
       >
+        {error && <div className="text-red-400 text-sm mb-4">{error}</div>}
+
         <header className="flex items-center gap-4">
           {activeProject.image && (
             <img
               src={activeProject.image}
-              alt={`${activeProject.title} logo`}
-              className="w-16 h-16 rounded-lg object-cover border-2 border-red-500 shadow-md"
+              alt={activeProject.title}
+              className="w-16 h-16 rounded-lg object-cover border-2 border-red-500"
             />
           )}
+
           <div>
             <h2 className="text-3xl font-bold text-white">
               {activeProject.title}
@@ -178,79 +223,32 @@ export default function Teams() {
           </div>
         </header>
 
-        {/* Project Meta */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-sm">
-          <div>
-            <span className="text-gray-400">Category:</span>{" "}
-            {activeProject.category}
-          </div>
-          {activeProject.tech && (
-            <div>
-              <span className="text-gray-400">Tech:</span> {activeProject.tech}
-            </div>
+        {/* META */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-sm text-gray-300">
+          {activeProject.category && (
+            <div>Category: {activeProject.category}</div>
           )}
+          {activeProject.tech && <div>Tech: {activeProject.tech}</div>}
           {activeProject.location && (
-            <div>
-              <span className="text-gray-400">Location:</span>{" "}
-              {activeProject.location}
-            </div>
+            <div>Location: {activeProject.location}</div>
           )}
-          {activeProject.budget && (
-            <div>
-              <span className="text-gray-400">Budget:</span>{" "}
-              {activeProject.budget}
-            </div>
-          )}
-          {activeProject.hourlyRate && (
-            <div>
-              <span className="text-gray-400">Hourly Rate:</span>{" "}
-              {activeProject.hourlyRate}
-            </div>
-          )}
-          {activeProject.rating && (
-            <div>
-              <span className="text-gray-400">Rating:</span> ⭐{" "}
-              {activeProject.rating}
-            </div>
-          )}
+          {activeProject.budget && <div>Budget: {activeProject.budget}</div>}
           {activeProject.priority && (
-            <div>
-              <span className="text-gray-400">Priority:</span>{" "}
-              {activeProject.priority}
-            </div>
+            <div>Priority: {activeProject.priority}</div>
           )}
+          {activeProject.status && <div>Status: {activeProject.status}</div>}
           {activeProject.deadline && (
-            <div>
-              <span className="text-gray-400">Deadline:</span>{" "}
-              {activeProject.deadline}
-            </div>
-          )}
-          {activeProject.status && (
-            <div>
-              <span className="text-gray-400">Status:</span>{" "}
-              {activeProject.status}
-            </div>
-          )}
-          {activeProject.milestoneProgress !== undefined && (
-            <div>
-              <span className="text-gray-400">Progress:</span>{" "}
-              {activeProject.milestoneProgress}%
-            </div>
+            <div>Deadline: {activeProject.deadline}</div>
           )}
         </div>
 
-        {/* Milestones */}
+        {/* MILESTONES */}
         {activeProject.milestones && (
           <section>
-            <h3 className="text-lg font-semibold mb-3 text-white">
+            <h3 className="text-lg font-semibold text-white mb-3">
               Milestones
             </h3>
-            <motion.ul
-              variants={container}
-              initial="hidden"
-              animate="visible"
-              className="space-y-3"
-            >
+            <motion.ul variants={container} initial="hidden" animate="visible">
               {activeProject.milestones.map((ms: Milestone, idx) => (
                 <motion.li
                   key={ms.id || idx}
@@ -261,13 +259,9 @@ export default function Teams() {
                   }
                 >
                   <MilestoneItem
-                    title={ms.title}
+                    milestone={ms} // ✅ unified type from types/project
                     accomplished={ms.status === "completed"}
-                    description={ms.description}
-                    amount={ms.amount}
-                    dueDate={ms.dueDate}
-                    status={ms.status}
-                    progress={ms.progress || 0} // backend value
+                    stats={milestoneStats} // ✅ global stats passed in
                   />
                 </motion.li>
               ))}
@@ -275,55 +269,42 @@ export default function Teams() {
           </section>
         )}
 
-        {/* Members */}
-        {activeProject.consultants && (
-          <section>
-            <h3 className="text-lg font-semibold mb-3 text-white">
-              Team Members
-            </h3>
-            <ul className="space-y-2">
-              {Array.isArray(activeProject.consultants) &&
-                activeProject.consultants.map((c, idx) =>
-                  typeof c === "string" ? (
-                    <MemberItem key={idx} name={c} role="Consultant" />
-                  ) : (
-                    <MemberItem key={c.id} name={c.name} role="Consultant" />
-                  )
-                )}
-            </ul>
-          </section>
-        )}
+        {/* TEAM MEMBERS */}
+        <section>
+          <h3 className="text-lg font-semibold text-white mb-3">
+            Team Members
+          </h3>
+
+          <ul className="space-y-2">
+            {teamMembers.map((m: TeamMember) => (
+              <MemberItem key={m.id} name={m.name} role={m.role} />
+            ))}
+          </ul>
+        </section>
       </motion.main>
 
-      {/* RIGHT PANEL (Alerts & Docs) */}
+      {/* ALERTS */}
       <motion.aside
         variants={item}
-        className="w-full md:w-72 bg-gradient-to-b from-gray-900 to-gray-800 
-                   border border-gray-700 rounded-xl p-6 space-y-6 shadow-lg ring-1 ring-gray-700"
+        className="w-full md:w-72 bg-gray-900 border border-gray-700 rounded-xl p-6 space-y-6"
       >
         <h3 className="text-lg font-semibold text-white">Alerts</h3>
+
         <ul className="space-y-3">
-          {activeProject.milestones?.map((ms, idx) => (
+          {activeProject.milestones?.map((ms: Milestone, idx) => (
             <AlertItem
               key={ms.id || idx}
-              message={`${ms.title} is ${ms.status}`}
-              type={statusToAlertType(ms.status)}
+              message={
+                ms.status === "completed"
+                  ? `${ms.title ?? "Milestone"} has been completed 🎉`
+                  : ms.status === "cancelled"
+                  ? `${ms.title ?? "Milestone"} was cancelled ⚠️`
+                  : `${ms.title ?? "Milestone"} is upcoming ⏳`
+              }
+              type={statusToAlertType(ms.status ?? "upcoming")}
             />
           ))}
         </ul>
-
-        <h3 className="text-lg font-semibold text-white">Project Docs</h3>
-        <div className="space-y-3 text-sm text-gray-300">
-          <p>Contracts, proposals, and shared files will appear here.</p>
-          <button
-            type="button"
-            className="px-4 py-2 rounded-md bg-gradient-to-r from-red-600 to-red-500 
-                       hover:from-red-700 hover:to-red-600 text-white text-xs shadow-md 
-                       transition transform hover:scale-105"
-          >
-            📂 Upload Document
-          </button>
-        </div>
       </motion.aside>
     </motion.div>
   );

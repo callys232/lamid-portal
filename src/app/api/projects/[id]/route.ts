@@ -4,9 +4,9 @@ import ProjectModel from "@/app/models/Project";
 
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
-  const { id } = await context.params;
+  const { id } = params;
   try {
     await dbConnect();
     const project = await ProjectModel.findById(id)
@@ -15,11 +15,12 @@ export async function GET(
       .populate("milestones")
       .exec();
 
-    if (!project)
+    if (!project) {
       return NextResponse.json(
         { success: false, message: "Project not found" },
         { status: 404 }
       );
+    }
 
     return NextResponse.json({
       success: true,
@@ -36,20 +37,21 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
-  const { id } = await context.params;
+  const { id } = params;
   try {
     await dbConnect();
     const body = await request.json();
     const updated = await ProjectModel.findByIdAndUpdate(id, body, {
       new: true,
     });
-    if (!updated)
+    if (!updated) {
       return NextResponse.json(
         { success: false, message: "Project not found" },
         { status: 404 }
       );
+    }
     return NextResponse.json({ success: true, data: updated });
   } catch (error) {
     console.error("Error updating project:", error);
@@ -62,17 +64,18 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
-  const { id } = await context.params;
+  const { id } = params;
   try {
     await dbConnect();
     const deleted = await ProjectModel.findByIdAndDelete(id);
-    if (!deleted)
+    if (!deleted) {
       return NextResponse.json(
         { success: false, message: "Project not found" },
         { status: 404 }
       );
+    }
     return NextResponse.json({ success: true, message: "Project deleted" });
   } catch (error) {
     console.error("Error deleting project:", error);

@@ -9,67 +9,47 @@ import Settings from "./settings/Settings";
 import Teams from "./Teams/Teams";
 import Notifications from "./tabs/Notifications";
 import Escrow from "./escrow/Escrow";
-import { ProjectOverviewProps } from "./tabs/Overview";
+import { Project } from "@/types/project";
+import { teamProjects, individualProjects } from "@/mocks/mockClient";
 
-// ✅ Seed Data
-const seedProject: ProjectOverviewProps = {
-  id: "seed-p1",
-  title: "AI Business Consultant System",
-  organization: "Lamid Corp",
-  location: "Remote",
-  category: "AI & Consulting",
-  rating: 4.8,
-  image: "/images/project-sample.jpg",
-  budget: 12000,
-  hourlyRate: "$80/hr",
-  tech: "React, Node.js, Tailwind, Python, AI",
-  timeline: "6 Months",
-  milestones: ["Planning", "MVP Build", "AI Integration", "Launch"],
-  skills: ["AI", "React", "Node.js", "UI/UX", "Prompt Engineering"],
-  escrow: [
-    {
-      date: "2025-10-20",
-      type: "Deposit",
-      amount: 6000,
-      status: "Held",
-      action: "View",
-    },
-    {
-      date: "2025-10-28",
-      type: "Release",
-      amount: 6000,
-      status: "Completed",
-      action: "Receipt",
-    },
-  ],
-};
-
-export default function ProfileDashboard() {
+export default function ProfileDashboard({
+  params,
+}: {
+  params?: { id?: string };
+}) {
   const [activeTab, setActiveTab] = useState("overview");
-  const [project, setProject] = useState<ProjectOverviewProps | null>(null);
-
-  // ✅ Missing state — added!
+  const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
+      const PROJECT_ID = params?.id || teamProjects[0]?.id;
+
       try {
-        const PROJECT_ID = "65b02f8e93fc9b24f4b89c20"; // replace with real ObjectId
         const res = await axios.get(`/api/projects/${PROJECT_ID}`);
 
-        if (res.data.success && res.data.data) {
-          setProject(res.data.data);
+        if (res.data?.data) {
+          setProject(res.data.data as Project);
+        } else {
+          throw new Error("No data returned from API");
         }
       } catch (err) {
-        console.error("API failed. Using seed data.");
-        setProject(seedProject); // ✅ use declared seed
+        console.error("API failed. Using mock data.", err);
+        setError("Unable to fetch project data. Showing fallback.");
+
+        const fallback =
+          teamProjects.find((p) => p.id === PROJECT_ID) ||
+          individualProjects.find((p) => p.id === PROJECT_ID);
+
+        setProject(fallback || null);
       } finally {
-        setLoading(false); // ✅ now exists
+        setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [params?.id]);
 
   const renderTab = () => {
     if (loading) return <p>Loading...</p>;
@@ -77,7 +57,7 @@ export default function ProfileDashboard() {
 
     switch (activeTab) {
       case "overview":
-        return <Overview {...project} />;
+        return <Overview project={project} />; // ✅ pass explicitly
       case "settings":
         return <Settings />;
       case "teams":
@@ -87,19 +67,25 @@ export default function ProfileDashboard() {
       case "escrow":
         return <Escrow />;
       default:
-        return <Overview {...project} />;
+        return <Overview project={project} />;
     }
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-[#0B0F19] text-white font-sans">
       <ProfileHeader />
-
       <div className="flex flex-col md:flex-row flex-1">
         <div className="w-full md:w-64 border-b md:border-b-0 md:border-r border-gray-800">
           <ProfileSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         </div>
-        <div className="flex-1 p-4 md:p-6 overflow-y-auto">{renderTab()}</div>
+        <div className="flex-1 p-4 md:p-6 overflow-y-auto">
+          {error && (
+            <div className="mb-4 p-2 bg-red-600 text-white rounded">
+              {error}
+            </div>
+          )}
+          {renderTab()}
+        </div>
       </div>
     </div>
   );

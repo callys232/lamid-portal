@@ -1,6 +1,5 @@
 // types/client.ts
-import { Project } from "./project";
-import { Milestone } from "./project";
+import { Project, Milestone } from "./project";
 
 /* -------------------- CONSULTANTS -------------------- */
 export interface Consultant {
@@ -11,13 +10,13 @@ export interface Consultant {
   delivery: string;
   rate: string | number;
   rating: number;
-  image?: string;
-  experience?: number;
   role: string;
-  email?: string;
-  skills?: string;
 
-  // ✅ Consultants can have their own projects
+  image?: string;
+  email?: string;
+  experience?: number;
+  skills?: string[];
+
   projects?: Project[];
 }
 
@@ -35,11 +34,13 @@ export interface EscrowTransaction {
     | "cancelled"
     | "disputed"
     | "completed";
+
   createdAt: string;
   updatedAt: string;
 
   releaseDate?: string;
   notes?: string;
+
   milestoneId?: string;
   milestones?: Milestone[];
 }
@@ -48,6 +49,7 @@ export interface EscrowTransaction {
 export interface Invitation {
   id: string;
   _id?: string;
+
   invitedBy?: string;
   projectId?: string;
   email?: string;
@@ -63,19 +65,20 @@ export interface Invitation {
 export interface TeamMember {
   id: string;
   _id?: string;
+
   name: string;
   role: string;
   email: string;
   addedAt: string;
 
-  // ✅ Team members can have their own projects
   projects?: Project[];
 }
 
-/* -------------------- AI AGENT LOGS -------------------- */
+/* -------------------- AI LOGS -------------------- */
 export interface AiActionLog {
   id: string;
   _id?: string;
+
   actionType:
     | "onboarding"
     | "project-scoping"
@@ -83,10 +86,10 @@ export interface AiActionLog {
     | "notification"
     | "marketing"
     | "support";
+
   message: string;
   createdAt: string;
 
-  // optional reference
   relatedProjectId?: string;
   relatedConsultantId?: string;
 }
@@ -110,37 +113,7 @@ export interface BusinessProfile {
   website?: string;
 }
 
-/* -------------------- CLIENT PROFILE (MASTER) -------------------- */
-export interface ClientProfile {
-  id: string;
-  _id?: string;
-  name: string;
-  email: string;
-  username: string | number;
-
-  business?: BusinessProfile;
-  ai?: AiPreferences;
-
-  projects: Project[];
-  consultants: Consultant[];
-  escrowTransactions: EscrowTransaction[];
-  invitations: Invitation[];
-  teamMembers?: TeamMember[];
-  aiLogs?: AiActionLog[];
-
-  createdAt: string;
-  updatedAt: string;
-  companyname?: string;
-  bio?: string;
-  isPremium?: boolean;
-  avatar?: string;
-  location?: string;
-  industry?: string;
-  balance?: number;
-  alerts?: Alert[];
-  notifications?: Notification[];
-}
-
+/* -------------------- ALERTS -------------------- */
 export interface Alert {
   id: string;
   type:
@@ -155,6 +128,7 @@ export interface Alert {
     | "Risk"
     | "document"
     | "complaint";
+
   message: string;
 
   channel?: string;
@@ -162,10 +136,12 @@ export interface Alert {
   createdAt?: string;
 }
 
+/* -------------------- NOTIFICATIONS -------------------- */
 export interface Notification {
   id: string;
   message: string;
   createdAt?: string;
+
   type:
     | "Broadcast"
     | "escrow"
@@ -178,5 +154,41 @@ export interface Notification {
     | "Risk"
     | "document"
     | "complaint";
+
   severity?: "Low" | "Medium" | "High";
+}
+
+/* -------------------- CLIENT PROFILE -------------------- */
+export interface ClientProfile {
+  id: string;
+  _id?: string;
+  name: string;
+  email: string;
+  username: string | number;
+
+  business?: BusinessProfile;
+  ai?: AiPreferences;
+
+  projects: Project[];
+  consultants: Consultant[];
+  escrowTransactions: EscrowTransaction[];
+  invitations: Invitation[];
+  teamMembers: TeamMember[];
+  aiLogs?: AiActionLog[];
+
+  createdAt: string;
+  updatedAt: string;
+
+  companyname?: string;
+  bio?: string;
+  isPremium?: boolean;
+  avatar?: string;
+  location?: string;
+  industry?: string;
+  balance?: number;
+
+  alerts: Alert[];
+  notifications: Notification[];
+
+  suggestedBidRange?: { min: number; max: number };
 }
