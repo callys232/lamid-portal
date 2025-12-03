@@ -1,18 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Project } from "@/types/project";
 import { mockClients } from "@/mocks/mockClient";
 
-export default function ProjectHeader({ projectId }: { projectId: string }) {
-  const [project, setProject] = useState<Project | null>(null);
+export default function SkillsCard({ projectId }: { projectId: string }) {
+  const [skills, setSkills] = useState<string[]>([]);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch(`/api/projects/${projectId}`);
+        const res = await fetch(`/api/projects/${projectId}/skills`);
         if (res.ok) {
           const { data } = await res.json();
-          setProject({ ...data, id: data._id || data.id });
+          setSkills(data || []);
           return;
         }
         throw new Error("Backend not ok");
@@ -20,19 +19,14 @@ export default function ProjectHeader({ projectId }: { projectId: string }) {
         const fallbackProject = mockClients[0].projects.find(
           (p) => p.id === projectId || p._id === projectId
         );
-        if (fallbackProject) {
-          setProject({
-            ...fallbackProject,
-            id: fallbackProject._id || fallbackProject.id,
-          });
-        }
+        setSkills(fallbackProject?.skills || []);
       }
     }
     fetchData();
   }, [projectId]);
 
-  if (!project)
-    return <div className="animate-pulse h-24 bg-gray-900 rounded-xl" />;
+  if (!skills.length)
+    return <div className="animate-pulse h-32 bg-gray-900 rounded-xl" />;
 
   return (
     <div
@@ -40,11 +34,20 @@ export default function ProjectHeader({ projectId }: { projectId: string }) {
                     transition transform hover:scale-[1.02] hover:bg-gray-900 
                     hover:border-[#c12129] relative group"
     >
-      <h2 className="text-2xl font-bold text-white">{project.title}</h2>
-      <p className="text-sm text-gray-400">{project.organization}</p>
+      <h3 className="text-lg font-semibold text-white mb-3">Skills</h3>
+      <div className="flex flex-wrap gap-2">
+        {skills.map((s, i) => (
+          <span
+            key={i}
+            className="bg-[#c12129] text-white px-3 py-1 rounded text-sm shadow-md"
+          >
+            {s}
+          </span>
+        ))}
+      </div>
       <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition">
         <span className="bg-[#c12129] text-white text-xs px-2 py-1 rounded shadow-md">
-          Project overview header
+          Required skills for this project
         </span>
       </div>
     </div>

@@ -1,14 +1,48 @@
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
 import dbConnect from "@/lib/dbConnect";
 import ProjectModel from "@/app/models/Project";
+import { teamProjects, individualProjects } from "@/mocks/mockClient";
+
+function handleError(error: unknown) {
+  if (error instanceof Error) {
+    return { message: error.message, stack: error.stack };
+  }
+  return { message: String(error) };
+}
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const { id } = params;
+
   try {
+    // ✅ First check mock IDs before ObjectId validation
+    const fallback =
+      teamProjects.find((p) => p.id === id) ||
+      individualProjects.find((p) => p.id === id);
+
+    if (fallback) {
+      return NextResponse.json({
+        success: true,
+        data: { ...fallback, id: fallback.id },
+        source: "mock",
+      });
+    }
+
+    // ✅ Then validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { success: false, message: "Invalid project ID" },
+        { status: 400 }
+      );
+    }
+
+    // ✅ Connect to DB
     await dbConnect();
+
+    // ✅ Query DB
     const project = await ProjectModel.findById(id)
       .populate("client")
       .populate("consultants")
@@ -25,62 +59,14 @@ export async function GET(
     return NextResponse.json({
       success: true,
       data: { ...project.toObject(), id: project._id.toString() },
+      source: "db",
     });
-  } catch (error) {
-    console.error("Error fetching project:", error);
-    return NextResponse.json(
-      { success: false, message: "Server error" },
-      { status: 500 }
-    );
-  }
-}
+  } catch (error: unknown) {
+    const errInfo = handleError(error);
+    console.error("Error fetching project:", errInfo);
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
-  try {
-    await dbConnect();
-    const body = await request.json();
-    const updated = await ProjectModel.findByIdAndUpdate(id, body, {
-      new: true,
-    });
-    if (!updated) {
-      return NextResponse.json(
-        { success: false, message: "Project not found" },
-        { status: 404 }
-      );
-    }
-    return NextResponse.json({ success: true, data: updated });
-  } catch (error) {
-    console.error("Error updating project:", error);
     return NextResponse.json(
-      { success: false, message: "Server error" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
-  try {
-    await dbConnect();
-    const deleted = await ProjectModel.findByIdAndDelete(id);
-    if (!deleted) {
-      return NextResponse.json(
-        { success: false, message: "Project not found" },
-        { status: 404 }
-      );
-    }
-    return NextResponse.json({ success: true, message: "Project deleted" });
-  } catch (error) {
-    console.error("Error deleting project:", error);
-    return NextResponse.json(
-      { success: false, message: "Server error" },
+      { success: false, message: "Server error", error: errInfo.message },
       { status: 500 }
     );
   }

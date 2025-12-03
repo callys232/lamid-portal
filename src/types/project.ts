@@ -14,7 +14,7 @@ export interface Project {
   organization?: string;
   image?: string;
   images?: string;
-
+  description?: string;
   milestones?: Milestone[];
   suggestedBidRange?: {
     min: number;

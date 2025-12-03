@@ -21,7 +21,7 @@ const navItems = [
   },
   {
     name: "CONSULTING",
-    href: "/consulting",
+    href: "/jobs",
     DropdownComponent: ConsultingDropdown,
   },
   { name: "TALENT CLUB", href: "/talent" },

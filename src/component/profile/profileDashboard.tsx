@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import ProfileHeader from "./ProfileHeader";
 import ProfileSidebar from "./ProfileSideBar";
-import Overview from "./tabs/Overview";
+import Overview from "./overview/overview";
 import Settings from "./settings/Settings";
 import Teams from "./Teams/Teams";
 import Notifications from "./tabs/Notifications";
@@ -26,6 +26,17 @@ export default function ProfileDashboard({
     const fetchData = async () => {
       const PROJECT_ID = params?.id || teamProjects[0]?.id;
 
+      // ✅ If PROJECT_ID matches a mock project, skip API call
+      const fallback =
+        teamProjects.find((p) => p.id === PROJECT_ID) ||
+        individualProjects.find((p) => p.id === PROJECT_ID);
+
+      if (fallback) {
+        setProject(fallback);
+        setLoading(false);
+        return;
+      }
+
       try {
         const res = await axios.get(`/api/projects/${PROJECT_ID}`);
 
@@ -37,12 +48,7 @@ export default function ProfileDashboard({
       } catch (err) {
         console.error("API failed. Using mock data.", err);
         setError("Unable to fetch project data. Showing fallback.");
-
-        const fallback =
-          teamProjects.find((p) => p.id === PROJECT_ID) ||
-          individualProjects.find((p) => p.id === PROJECT_ID);
-
-        setProject(fallback || null);
+        setProject(null);
       } finally {
         setLoading(false);
       }
@@ -55,9 +61,12 @@ export default function ProfileDashboard({
     if (loading) return <p>Loading...</p>;
     if (!project) return <p>No project data available.</p>;
 
+    // ✅ Narrow once, no unsafe cast
+    const projectId = project.id;
+
     switch (activeTab) {
       case "overview":
-        return <Overview project={project} />; // ✅ pass explicitly
+        return <Overview projectId={projectId} />;
       case "settings":
         return <Settings />;
       case "teams":
@@ -67,7 +76,7 @@ export default function ProfileDashboard({
       case "escrow":
         return <Escrow />;
       default:
-        return <Overview project={project} />;
+        return <Overview projectId={projectId} />;
     }
   };
 
