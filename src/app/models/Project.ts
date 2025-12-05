@@ -1,40 +1,67 @@
-import mongoose, { Schema, models } from "mongoose";
+import mongoose, { Schema, Document, models } from "mongoose";
 
-const ProjectSchema = new Schema(
+export interface Outreach {
+  campaigns: string[];
+  keywords: string[];
+}
+
+export interface ProjectDocument extends Document {
+  title: string;
+  category?: string;
+  tech: string[];
+  location?: string;
+  budget?: string;
+  hourlyRate?: string;
+  rating: number;
+  organization?: string;
+  image?: string;
+  description?: string;
+  status: string;
+  deadline?: Date;
+  owner?: string;
+  team: string[];
+  outreach: Outreach;
+}
+
+const OutreachSchema = new Schema<Outreach>(
   {
-    title: { type: String, required: true, trim: true },
-    category: { type: String, trim: true },
-    tech: { type: [String], default: [] }, // <-- changed to array for multiple tech stacks
-    location: { type: String, trim: true },
+    campaigns: { type: [String], default: [] },
+    keywords: { type: [String], default: [] },
+  },
+  { _id: false }
+);
 
-    // Finance fields
-    budget: { type: String },
-    hourlyRate: { type: String },
-
-    // Rating
-    rating: { type: Number, default: 0, min: 0, max: 5 },
-
-    organization: { type: String, trim: true },
-    image: { type: String },
-
-    description: { type: String },
-
+const ProjectSchema = new Schema<ProjectDocument>(
+  {
+    title: { type: String, required: true },
+    category: String,
+    tech: { type: [String], default: [] },
+    location: String,
+    budget: String,
+    hourlyRate: String,
+    rating: { type: Number, default: 0 },
+    organization: String,
+    image: String,
+    description: String,
     status: {
       type: String,
       enum: ["pending", "in-progress", "completed"],
       default: "pending",
     },
-
-    deadline: { type: Date },
-
-    owner: { type: String, trim: true },
-
-    // Team can store user IDs or names
+    deadline: Date,
+    owner: String,
     team: [{ type: String }],
+
+    // ⭐ required to prevent "any"
+    outreach: {
+      type: OutreachSchema,
+      default: () => ({ campaigns: [], keywords: [] }),
+    },
   },
   { timestamps: true }
 );
 
-// Prevents model overwrite on hot reload (Next.js)
-const Project = models.Project || mongoose.model("Project", ProjectSchema);
+const Project =
+  models.Project || mongoose.model<ProjectDocument>("Project", ProjectSchema);
+
 export default Project;

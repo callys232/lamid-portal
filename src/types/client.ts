@@ -138,7 +138,7 @@ export interface Alert {
 
 /* -------------------- NOTIFICATIONS -------------------- */
 export interface Notification {
-  id: string;
+  id: number;
   message: string;
   createdAt?: string;
 

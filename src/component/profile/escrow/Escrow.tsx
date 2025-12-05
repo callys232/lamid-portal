@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import ProjectCard from "../../projects/projectCard";
 import EscrowTable from "./escrowTable";
-import { Project } from "../../projects/projectData";
+import { Project } from "@/types/project";
 
 export default function Dashboard() {
   const [projects, setProjects] = useState<Project[]>([]);

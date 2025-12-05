@@ -13,52 +13,18 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import { mockClients } from "@/mocks/mockClient"; // ✅ import mock
 
 interface Props {
   client?: ClientProfile;
 }
 
-const mockClient: ClientProfile = {
-  id: "cl1",
-  name: "Lamid Corp",
-  email: "admin@lamid.com",
-  username: "lamid",
-  projects: [{ id: "p1", title: "Alpha", category: "Tech" }],
-  consultants: [
-    {
-      id: "c1",
-      name: "Jane Doe",
-      industry: "Tech",
-      delivery: "Remote",
-      rate: "50/hr",
-      rating: 4.5,
-      role: "Developer",
-    },
-    {
-      id: "c2",
-      name: "John Smith",
-      industry: "Finance",
-      delivery: "Onsite",
-      rate: "70/hr",
-      rating: 3.8,
-      role: "Analyst",
-    },
-  ],
-  escrowTransactions: [],
-  invitations: [],
-  createdAt: "",
-  updatedAt: "",
-  balance: 12000,
-  isPremium: true,
-};
-
-export default function ClientStats({ client = mockClient }: Props) {
+export default function ClientStats({ client = mockClients[0] }: Props) {
   const totalConsultants = client.consultants?.length ?? 0;
   const totalProjects = client.projects?.length ?? 0;
   const totalEscrows = client.escrowTransactions?.length ?? 0;
   const totalInvitations = client.invitations?.length ?? 0;
 
-  // Pie chart data for distribution
   const pieData = [
     { name: "Projects", value: totalProjects },
     { name: "Consultants", value: totalConsultants },
@@ -67,7 +33,6 @@ export default function ClientStats({ client = mockClient }: Props) {
   ];
   const COLORS = ["#c21229", "#ff6666", "#444", "#888"];
 
-  // Trend line mock data (growth over months)
   const trendData = [
     { month: "Jan", projects: 1, consultants: 1 },
     { month: "Feb", projects: 2, consultants: 1 },
@@ -77,11 +42,7 @@ export default function ClientStats({ client = mockClient }: Props) {
   ];
 
   return (
-    <div
-      className="bg-[#0f0f0f]/70 backdrop-blur-md border border-[#1f1f1f] rounded-lg p-6 
-                 shadow-lg transition-transform duration-300 
-                 hover:scale-105 hover:shadow-[0_0_25px_#c21229]"
-    >
+    <div className="bg-[#0f0f0f]/70 backdrop-blur-md border border-[#1f1f1f] rounded-lg p-6 shadow-lg transition-transform duration-300 hover:scale-105 hover:shadow-[0_0_25px_#c21229]">
       <h3 className="text-lg font-semibold text-white mb-4">
         📊 Client Metrics
       </h3>

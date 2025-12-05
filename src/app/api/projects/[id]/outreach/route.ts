@@ -17,9 +17,10 @@ const mockOutreach = {
 // GET outreach data
 export async function GET(
   request: NextRequest,
-  context: { params: { id: string } }
-) {
-  const { id } = context.params;
+  context: { params: Promise<{ id: string }> }
+): Promise<Response> {
+  const { id } = await context.params;
+
   try {
     await dbConnect();
     const project = await ProjectModel.findById(id).exec();
@@ -47,9 +48,9 @@ export async function GET(
 // PATCH outreach settings (keywords, campaigns)
 export async function PATCH(
   request: NextRequest,
-  context: { params: { id: string } }
-) {
-  const { id } = context.params;
+  context: { params: Promise<{ id: string }> }
+): Promise<Response> {
+  const { id } = await context.params;
   try {
     await dbConnect();
     const body = await request.json();
@@ -80,9 +81,9 @@ export async function PATCH(
 // POST new campaign
 export async function POST(
   request: NextRequest,
-  context: { params: { id: string } }
-) {
-  const { id } = context.params;
+  context: { params: Promise<{ id: string }> }
+): Promise<Response> {
+  const { id } = await context.params;
   try {
     await dbConnect();
     const body = await request.json();

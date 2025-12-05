@@ -5,6 +5,12 @@ import NotificationCenter, { Notification } from "./notify";
 import AdminControls from "./controls";
 import { ClientProfile } from "@/types/client";
 
+interface BackendNotification {
+  message: string;
+  channel?: string;
+  severity?: string;
+}
+
 // Helper to safely map backend strings to Notification["type"]
 function mapChannelType(channel?: string): Notification["type"] {
   switch (channel?.toLowerCase()) {
@@ -37,12 +43,14 @@ export default function CommunicationAgent({ clientId }: { clientId: string }) {
 
         // Map backend notifications into NotificationCenter format
         const mapped: Notification[] = (data.notifications || []).map(
-          (msg, i) => ({
+          (msg: BackendNotification, i: number) => ({
             id: i + 1,
-            type: mapChannelType("email"), // refine if backend provides channel info
-            message: msg,
+            type: mapChannelType(msg.channel),
+            message: msg.message,
+            severity: msg.severity,
           })
         );
+
         setNotifications(mapped);
       } catch (err) {
         console.error("Error fetching client, using mock data", err);

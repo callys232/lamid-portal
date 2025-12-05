@@ -6,6 +6,8 @@ import {
   EscrowTransaction,
   Invitation,
   AiActionLog,
+  Alert,
+  Notification,
 } from "@/types/client";
 import { Project, Milestone, ActivityItem } from "@/types/project";
 
@@ -353,6 +355,21 @@ export const mockClients: ClientProfile[] = [
     escrowTransactions: mockEscrowTransactions,
     invitations: mockInvitations,
     aiLogs: mockAiLogs,
+    alerts: [
+      {
+        id: "a1",
+        type: "Risk",
+        message: "Milestone overdue",
+        severity: "High",
+      } as Alert,
+    ],
+    notifications: [
+      {
+        id: 1,
+        type: "Email",
+        message: "Reminder: Team sync at 3 PM",
+      } as Notification,
+    ],
     createdAt: now,
     updatedAt: now,
   },
@@ -370,6 +387,21 @@ export const mockClients: ClientProfile[] = [
     escrowTransactions: [],
     invitations: [],
     aiLogs: [],
+    alerts: [
+      {
+        id: "a1",
+        type: "message",
+        message: "Milestone in progress",
+        severity: "High",
+      } as Alert,
+    ],
+    notifications: [
+      {
+        id: 1,
+        type: "Email",
+        message: "Reminder: upload at 3 PM",
+      } as Notification,
+    ],
     createdAt: now,
     updatedAt: now,
   },

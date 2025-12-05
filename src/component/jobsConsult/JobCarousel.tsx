@@ -51,29 +51,39 @@ export default function JobCarousel({
     <section className="relative" aria-label={`${title} carousel`}>
       <h2 className="text-xl font-bold text-white mb-3">{title}</h2>
 
-      {/* Left arrow */}
-      {canScrollLeft && (
-        <button
-          type="button"
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/40 hover:bg-black/70 text-white px-3 py-2 rounded-full transition focus:outline-none focus:ring-2 focus:ring-[#c21219]"
-          onClick={() => scrollBy(-400)}
-          aria-label="Scroll left"
-        >
-          ‹
-        </button>
-      )}
-
-      {/* Gradient scroll hint left */}
-      {canScrollLeft && (
-        <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#0B0F19] to-transparent pointer-events-none" />
-      )}
+      {/* Desktop arrows only */}
+      <div className="hidden md:block">
+        {canScrollLeft && (
+          <button
+            type="button"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/40 hover:bg-black/70 text-white px-3 py-2 rounded-full transition focus:outline-none focus:ring-2 focus:ring-[#c21219]"
+            onClick={() => scrollBy(-400)}
+            aria-label="Scroll left"
+          >
+            ‹
+          </button>
+        )}
+        {canScrollRight && (
+          <button
+            type="button"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/40 hover:bg-black/70 text-white px-3 py-2 rounded-full transition focus:outline-none focus:ring-2 focus:ring-[#c21219]"
+            onClick={() => scrollBy(400)}
+            aria-label="Scroll right"
+          >
+            ›
+          </button>
+        )}
+      </div>
 
       {/* Carousel container */}
       <div
         ref={ref}
         tabIndex={0}
         onKeyDown={handleKeyDown}
-        className="flex gap-4 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory focus:outline-none focus:ring-2 focus:ring-[#c21219]"
+        className="
+          flex gap-4 scroll-smooth pb-2 snap-mandatory focus:outline-none focus:ring-2 focus:ring-[#c21219]
+          flex-col overflow-y-auto md:flex-row md:overflow-x-auto
+        "
         role="list"
       >
         {jobs.length === 0 ? (
@@ -82,7 +92,7 @@ export default function JobCarousel({
           jobs.map((job) => (
             <div
               key={job._id || job.id}
-              className="min-w-[280px] md:min-w-[320px] lg:min-w-[360px] snap-start"
+              className="snap-start min-w-[280px] md:min-w-[320px] lg:min-w-[360px]"
               role="listitem"
             >
               <JobCard
@@ -94,23 +104,6 @@ export default function JobCarousel({
           ))
         )}
       </div>
-
-      {/* Gradient scroll hint right */}
-      {canScrollRight && (
-        <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#0B0F19] to-transparent pointer-events-none" />
-      )}
-
-      {/* Right arrow */}
-      {canScrollRight && (
-        <button
-          type="button"
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/40 hover:bg-black/70 text-white px-3 py-2 rounded-full transition focus:outline-none focus:ring-2 focus:ring-[#c21219]"
-          onClick={() => scrollBy(400)}
-          aria-label="Scroll right"
-        >
-          ›
-        </button>
-      )}
     </section>
   );
 }

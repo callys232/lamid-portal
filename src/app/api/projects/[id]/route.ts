@@ -13,9 +13,9 @@ function handleError(error: unknown) {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
+  context: { params: Promise<{ id: string }> }
+): Promise<Response> {
+  const { id } = await context.params;
 
   try {
     // ✅ First check mock IDs before ObjectId validation

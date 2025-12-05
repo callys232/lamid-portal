@@ -5,6 +5,11 @@ import ConversationFlow from "./convoFLow";
 import NotificationCenter, { Notification } from "./Notifs";
 import { ClientProfile } from "@/types/client";
 
+interface BackendNotification {
+  message: string;
+  channel?: string;
+  severity?: string;
+}
 // Helper to safely map backend strings to Notification["type"]
 function mapChannelType(channel?: string): Notification["type"] {
   switch (channel?.toLowerCase()) {
@@ -37,10 +42,11 @@ export default function CommunicationAgent({ clientId }: { clientId: string }) {
 
         // Map backend notifications into NotificationCenter format
         const mapped: Notification[] = (data.notifications || []).map(
-          (msg, i) => ({
+          (msg: BackendNotification, i: number) => ({
             id: i + 1,
-            type: mapChannelType("email"), // refine if backend provides channel info
-            message: msg,
+            type: mapChannelType(msg.channel || "email"),
+            message: msg.message, // ✅ string
+            severity: msg.severity, // optional
           })
         );
         setNotifications(mapped);

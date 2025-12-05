@@ -3,9 +3,9 @@
 import React, { useState } from "react";
 import OnboardingAgent from "./Onboarding";
 import ProjectAgent from "./project/projectAgent";
-import CommunicationAgent from "./communicationAgent";
+import CommunicationAgent from "./communicationAgent/Communicate";
 import AnalyticsAgent from "./analyticsAgent";
-import OutreachAgent from "./OutreachAgent";
+import OutreachAgent from "./outreach/outreachSeo";
 
 type AgentKey =
   | "onboarding"
@@ -16,6 +16,9 @@ type AgentKey =
 
 export default function AgentShell() {
   const [activeAgent, setActiveAgent] = useState<AgentKey>("onboarding");
+
+  const [clientId] = useState("client1");
+  const [projectId] = useState("project1");
 
   const items: { key: AgentKey; label: string; emoji: string }[] = [
     { key: "onboarding", label: "Onboarding & Guidance", emoji: "🧭" },
@@ -50,9 +53,13 @@ export default function AgentShell() {
       <main className="flex-1 p-6 overflow-y-auto">
         {activeAgent === "onboarding" && <OnboardingAgent />}
         {activeAgent === "project" && <ProjectAgent />}
-        {activeAgent === "communication" && <CommunicationAgent />}
+        {activeAgent === "communication" && (
+          <CommunicationAgent clientId={clientId} />
+        )}{" "}
         {activeAgent === "analytics" && <AnalyticsAgent />}
-        {activeAgent === "outreach" && <OutreachAgent />}
+        {activeAgent === "outreach" && (
+          <OutreachAgent projectId={projectId} />
+        )}{" "}
       </main>
 
       {/* Context panel */}

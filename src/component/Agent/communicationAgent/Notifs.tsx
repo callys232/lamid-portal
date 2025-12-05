@@ -6,7 +6,8 @@ export interface Notification {
   id: number;
   type: "Email" | "Slack" | "SMS" | "Risk" | "Broadcast";
   message: string;
-  severity?: "Low" | "Medium" | "High"; // only for risk alerts
+  // severity?: "Low" | "Medium" | "High"; // only for risk alerts
+  severity?: string;
 }
 
 interface NotificationCenterProps {

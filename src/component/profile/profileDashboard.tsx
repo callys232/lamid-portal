@@ -11,6 +11,7 @@ import Notifications from "./tabs/Notifications";
 import Escrow from "./escrow/Escrow";
 import { Project } from "@/types/project";
 import { teamProjects, individualProjects } from "@/mocks/mockClient";
+import { SkeletonLoader } from "@/component/SkeletonLoader"; // ✅ default import
 
 export default function ProfileDashboard({
   params,
@@ -26,7 +27,6 @@ export default function ProfileDashboard({
     const fetchData = async () => {
       const PROJECT_ID = params?.id || teamProjects[0]?.id;
 
-      // ✅ If PROJECT_ID matches a mock project, skip API call
       const fallback =
         teamProjects.find((p) => p.id === PROJECT_ID) ||
         individualProjects.find((p) => p.id === PROJECT_ID);
@@ -39,7 +39,6 @@ export default function ProfileDashboard({
 
       try {
         const res = await axios.get(`/api/projects/${PROJECT_ID}`);
-
         if (res.data?.data) {
           setProject(res.data.data as Project);
         } else {
@@ -61,12 +60,15 @@ export default function ProfileDashboard({
     if (loading) return <p>Loading...</p>;
     if (!project) return <p>No project data available.</p>;
 
-    // ✅ Narrow once, no unsafe cast
     const projectId = project.id;
 
     switch (activeTab) {
       case "overview":
-        return <Overview projectId={projectId} />;
+        return projectId ? (
+          <Overview projectId={projectId} />
+        ) : (
+          <SkeletonLoader />
+        );
       case "settings":
         return <Settings />;
       case "teams":
@@ -76,7 +78,11 @@ export default function ProfileDashboard({
       case "escrow":
         return <Escrow />;
       default:
-        return <Overview projectId={projectId} />;
+        return projectId ? (
+          <Overview projectId={projectId} />
+        ) : (
+          <SkeletonLoader />
+        );
     }
   };
 

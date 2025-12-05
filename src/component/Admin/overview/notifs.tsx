@@ -9,24 +9,12 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
-
-interface Notification {
-  id: string;
-  message: string;
-  createdAt?: string; // ISO date string
-}
+import { Notification } from "@/types/client";
+import { mockNotifications } from "@/mocks/mockJobs";
 
 interface Props {
   notifications?: Notification[];
 }
-
-const mockNotifications: Notification[] = [
-  { id: "1", message: "New consultant joined", createdAt: "2025-11-12" },
-  { id: "2", message: "Policy update applied", createdAt: "2025-11-12" },
-  { id: "3", message: "Finance report exported", createdAt: "2025-11-11" },
-  { id: "4", message: "Escrow funded", createdAt: "2025-11-11" },
-  { id: "5", message: "Milestone released", createdAt: "2025-11-10" },
-];
 
 // Prepare chart data: count notifications per day
 const aggregateByDay = (notifications: Notification[]) => {
@@ -39,7 +27,7 @@ const aggregateByDay = (notifications: Notification[]) => {
 };
 
 export default function NotificationsPanel({
-  notifications = mockNotifications,
+  notifications = mockNotifications, // ✅ use imported mock data as fallback
 }: Props) {
   const chartData = aggregateByDay(notifications);
 

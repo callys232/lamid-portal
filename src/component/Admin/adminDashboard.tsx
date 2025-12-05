@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import AdminSidebar from "./sideBar";
+import AdminSidebar, { TabName } from "./sideBar"; // ✅ import TabName type
 import Overview from "./overview/Overview";
 import AnalyticsAgent from "./analytic/analytic";
 import OutreachAgent from "./aiagents/outreach/outreachAgent";
@@ -24,28 +24,21 @@ function SkeletonLoader() {
   );
 }
 
-/* -------------------- Tab Names -------------------- */
-type TabName =
-  | "overview"
-  | "analytics"
-  | "outreach"
-  | "communication"
-  | "finance"
-  | "policy"
-  | "logs";
-
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<TabName>("overview");
+  const [activeTab, setActiveTab] = useState<TabName>("Overview"); // ✅ matches sidebar TabName
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [projectId, setProjectId] = useState<string | null>(null);
+  const [clientId, setClientId] = useState<string | null>(null);
 
-  /* -------------------- Simulated Fetch -------------------- */
+  /* -------------------- Fetch Admin Data -------------------- */
   useEffect(() => {
     const fetchAdminData = async () => {
       try {
         setLoading(true);
-        // Example: fetch admin stats or config
-        await axios.get("/api/admin/bootstrap");
+        const { data } = await axios.get("/api/admin/admin");
+        setProjectId(data.projectId);
+        setClientId(data.clientId);
       } catch (err) {
         console.warn("Admin bootstrap failed:", err);
       } finally {
@@ -60,19 +53,27 @@ export default function AdminDashboard() {
     if (loading) return <SkeletonLoader />;
 
     switch (activeTab) {
-      case "overview":
+      case "Overview":
         return <Overview />;
-      case "analytics":
+      case "Analytics Agent":
         return <AnalyticsAgent />;
-      case "outreach":
-        return <OutreachAgent />;
-      case "communication":
-        return <CommunicationAgent />;
-      case "finance":
+      case "Outreach & SEO Agent":
+        return projectId ? (
+          <OutreachAgent projectId={projectId} />
+        ) : (
+          <SkeletonLoader />
+        );
+      case "Communication Agent":
+        return clientId ? (
+          <CommunicationAgent clientId={clientId} />
+        ) : (
+          <SkeletonLoader />
+        );
+      case "Finance & Billing":
         return <FinanceBilling />;
-      case "policy":
+      case "Policy & Compliance":
         return <PolicyCompliance />;
-      case "logs":
+      case "Activity Logs":
         return <ActivityLogs />;
       default:
         return <Overview />;
@@ -105,7 +106,7 @@ export default function AdminDashboard() {
         >
           <AdminSidebar
             activeTab={activeTab}
-            setActiveTab={(tab: TabName) => {
+            onTabChange={(tab: TabName) => {
               setActiveTab(tab);
               setSidebarOpen(false);
             }}

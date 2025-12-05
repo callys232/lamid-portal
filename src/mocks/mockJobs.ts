@@ -1,4 +1,5 @@
 import { Project } from "@/types/project";
+import { Notification } from "@/types/client";
 
 export const mockJobs: Project[] = [
   {
@@ -217,5 +218,33 @@ export const mockJobs: Project[] = [
     deadline: "2026-02-28",
     priority: "High",
     skills: ["Tableau", "Data Analysis"],
+  },
+];
+
+export const mockNotifications: Notification[] = [
+  {
+    id: 1,
+    type: "Email",
+    message: "New consultant joined",
+    createdAt: "2025-11-12",
+  },
+  {
+    id: 2,
+    type: "Broadcast",
+    message: "Policy update applied",
+    createdAt: "2025-11-12",
+  },
+  {
+    id: 3,
+    type: "document",
+    message: "Finance report exported",
+    createdAt: "2025-11-11",
+  },
+  { id: 4, type: "escrow", message: "Escrow funded", createdAt: "2025-11-11" },
+  {
+    id: 5,
+    type: "milestone",
+    message: "Milestone released",
+    createdAt: "2025-11-10",
   },
 ];

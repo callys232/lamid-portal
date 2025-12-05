@@ -294,7 +294,7 @@ export default function ProjectModal({
                 Close
               </button>
 
-              <button
+              {/* <button
                 onClick={() => router.push(`/projects/${project.id}/apply`)}
                 className="
                   px-6 py-2 rounded-md font-semibold
@@ -309,7 +309,8 @@ export default function ProjectModal({
 
             {showApplyForm && (
               <ApplyForm project={project} onSubmit={handleSubmit} />
-            )}
+            )} */}
+            </div>
           </div>
         </motion.div>
       </motion.div>
