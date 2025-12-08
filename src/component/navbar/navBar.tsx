@@ -13,7 +13,11 @@ import ConsultingDropdown from "./ConsultingDropdown";
 
 const navItems = [
   { name: "HOME", href: "/" },
-  { name: "SERVICES", href: "/services", DropdownComponent: ServicesDropdown },
+  {
+    name: "SERVICES",
+    href: "/CoreServices",
+    DropdownComponent: ServicesDropdown,
+  },
   {
     name: "PORTFOLIO",
     href: "/portfolio",

@@ -5,99 +5,148 @@ import Image from "next/image";
 import Link from "next/link";
 
 interface PipelineStage {
-  title: string;
+  description: string;
   icon: string;
-  color: string;
   href: string;
+  bg: string;
+  border: string;
+  text?: string;
 }
 
 const stages: PipelineStage[] = [
   {
-    title: "Viable Opportunities",
+    description: "Identify and validate promising startup ideas.",
     icon: "/icons/opportunities.png",
-    color: "bg-purple-700 hover:bg-purple-800 border-purple-500",
     href: "/innovazion/opportunities",
+    bg: "bg-purple-700",
+    border: "border-purple-500",
   },
   {
-    title: "State-of-the-art Structures & Systems",
+    description: "Build scalable frameworks and digital systems.",
     icon: "/icons/structures.png",
-    color: "bg-gray-900 hover:bg-gray-800 border-gray-600",
     href: "/innovazion/structures",
+    bg: "bg-black",
+    border: "border-gray-700",
   },
   {
-    title: "Mentoring Strategy",
+    description: "Expert guidance to accelerate growth.",
     icon: "/icons/mentoring.png",
-    color: "bg-teal-600 hover:bg-teal-700 border-teal-400",
     href: "/innovazion/mentoring",
+    bg: "bg-teal-600",
+    border: "border-teal-400",
   },
   {
-    title: "Minimum Viable Prototype & Model",
+    description: "Rapid prototyping to test and refine ideas.",
     icon: "/icons/prototype.png",
-    color: "bg-red-600 hover:bg-red-700 border-red-400",
     href: "/innovazion/prototype",
+    bg: "bg-red-600",
+    border: "border-red-400",
   },
   {
-    title: "Top-of-market Talent Services",
+    description: "Access elite talent for execution.",
     icon: "/icons/talent.png",
-    color: "bg-orange-500 hover:bg-orange-600 border-orange-400",
     href: "/innovazion/talent",
+    bg: "bg-orange-500",
+    border: "border-orange-400",
   },
   {
-    title: "Joint Ventures",
+    description: "Collaborate with partners for expansion.",
     icon: "/icons/joint-ventures.png",
-    color: "bg-green-600 hover:bg-green-700 border-green-400",
     href: "/innovazion/joint-ventures",
+    bg: "bg-green-600",
+    border: "border-green-400",
   },
   {
-    title: "State-of-the-art Structures & Systems",
+    description: "Reinforce infrastructure for scaling.",
     icon: "/icons/structures.png",
-    color: "bg-gray-900 hover:bg-gray-800 border-gray-600",
     href: "/innovazion/structures-2",
+    bg: "bg-black",
+    border: "border-gray-700",
   },
   {
-    title: "Global Access",
+    description: "Connect to international markets and networks.",
     icon: "/icons/global-access.png",
-    color: "bg-white hover:bg-gray-100 border-gray-300 text-black",
     href: "/innovazion/global-access",
+    bg: "bg-white",
+    border: "border-gray-300",
+    text: "text-black",
   },
 ];
 
 const InnovazionZone: FC = () => {
   return (
     <section className="bg-black py-10 px-4 text-white">
-      <div className="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-        {stages.map((stage, index) => (
-          <Link key={index} href={stage.href} className="group">
+      <div className="flex flex-wrap justify-center gap-8">
+        {stages.map((stage) => (
+          <Link key={stage.description} href={stage.href} className="group">
             <div
-              className={`rounded-lg p-4 border text-center transition-transform transform hover:scale-105 shadow-md ${stage.color}`}
+              className={`w-[160px] h-[240px] rounded-xl ${stage.bg} ${stage.border} border 
+                          shadow-md transition-all duration-300 
+                          flex flex-col items-center justify-start text-center p-5
+                          hover:brightness-60 hover:border-red-500`}
             >
-              <div className="w-12 h-12 mx-auto mb-3">
+              {/* Icon */}
+              <div className="w-12 h-12 mb-6">
                 <Image
                   src={stage.icon}
-                  alt={`${stage.title} icon`}
+                  alt="stage icon"
                   width={48}
                   height={48}
                   className="object-contain"
                 />
               </div>
+
+              {/* Animated Curled Arrow */}
+              <div className="mb-6">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 50 50"
+                  width="36"
+                  height="36"
+                  className="text-red-500 mx-auto"
+                >
+                  <path
+                    d="M25 5 C25 20, 5 20, 25 35 L25 45"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeLinecap="round"
+                    className="group-hover:[stroke-dasharray:100] group-hover:[stroke-dashoffset:100] group-hover:animate-[draw_1s_ease-in-out_forwards]"
+                  />
+                  <polygon points="20,45 30,45 25,50" fill="currentColor" />
+                </svg>
+              </div>
+
+              {/* Description */}
               <p
-                className={`text-sm font-semibold leading-snug ${
-                  stage.color.includes("text-black")
-                    ? "text-black"
-                    : "text-white"
+                className={`text-xs leading-snug ${
+                  stage.text ?? "text-gray-200"
                 }`}
               >
-                {stage.title}
+                {stage.description}
               </p>
             </div>
           </Link>
         ))}
       </div>
 
-      <p className="mt-8 text-center text-sm text-gray-300">
+      {/* Caption */}
+      <p className="mt-10 text-center text-sm text-gray-300">
         Over <span className="text-yellow-400 font-bold">3000</span> start-ups
-        created and accelerated. Be the next raving success!
+        created and accelerated.{" "}
+        <span className="text-red-500 font-semibold">
+          Be the next raving success!
+        </span>
       </p>
+
+      {/* Keyframes for arrow draw animation */}
+      <style jsx>{`
+        @keyframes draw {
+          to {
+            stroke-dashoffset: 0;
+          }
+        }
+      `}</style>
     </section>
   );
 };

@@ -70,3 +70,15 @@ body {
   border-left: 8px solid #c21219; /* matches Lamid red gradient */
   border-bottom: 0 solid transparent;
 }
+@keyframes slide {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-slide {
+  animation: slide 30s linear infinite;
+}
