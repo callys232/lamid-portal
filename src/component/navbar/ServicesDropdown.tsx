@@ -15,12 +15,12 @@ export default function ServicesDropdown({
   const items = [
     {
       name: "Business Development",
-      href: "/services/business-development",
+      href: "/biz",
       desc: "Helping organizations expand their reach and impact.",
     },
     {
       name: "Human Capital",
-      href: "/services/human-capital",
+      href: "/hcd",
       desc: "Building high-performing teams and leadership pipelines.",
     },
     {

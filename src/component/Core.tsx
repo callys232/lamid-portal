@@ -15,14 +15,14 @@ interface Service {
 const services: Service[] = [
   {
     name: "Business Innovation Zone",
-    href: "/services/business-innovation-zone",
+    href: "/biz",
     color: "bg-red-600",
     logo: "/innovation-logo.png",
   },
   {
     name: "Human Capital Development",
-    href: "/services/human-capital-development",
-    color: "bg-blue-600",
+    href: "/hcd",
+    color: "bg-orange-600",
     logo: "/human-capital-logo.png",
   },
   {
