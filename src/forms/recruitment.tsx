@@ -5,7 +5,7 @@ import Head from "next/head";
 import { User } from "@/types/user";
 import FormInput from "./formInput";
 import FormSelect from "./formSelect";
-import FormTextarea from "./formTextare";
+import FormTextarea from "./formTextarea";
 import FormFileUpload from "./formFileupload";
 import ProgressBar from "./progressBar";
 

@@ -5,7 +5,7 @@ import Section from "@/component/portfolio/section";
 import PlegeandStrategy from "@/component/portfolio/plegeandStrategy";
 import AboutUs from "@/component/AboutUs";
 import Value from "@/component/portfolio/values";
-import Slider from "@/component/portfolio/slider";
+import Slider from "@/component/slider";
 import ContactUs from "@/component/contactUs";
 
 const portfolioPage = () => {

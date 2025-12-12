@@ -6,8 +6,8 @@ import Head from "next/head";
 // Reusable components
 import FormInput from "./formInput";
 import FormSelect from "./formSelect";
-import FormTextArea from "./formTextArea";
-import FileUpload from "./fileUpload";
+import FormTextArea from "./formTextarea";
+import FileUpload from "./formFileupload";
 import ProgressBar from "./progressBar";
 
 import { User } from "@/types/user";
@@ -283,6 +283,7 @@ const TalentClubForm: React.FC = () => {
         {/* File Upload */}
         <FileUpload
           label="Upload CV (PDF or DOC)"
+          name="cvFile" // <-- add this
           onChange={(file) =>
             setFormData((prev) => ({ ...prev, cvFile: file }))
           }

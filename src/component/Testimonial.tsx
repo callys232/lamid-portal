@@ -1,28 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import Head from "next/head";
 import { motion } from "framer-motion";
 import { fadeInUp, fadeInDown, staggerContainer } from "@/utils/motionVaraints";
 
-// Define client type
-interface Client {
-  name: string;
-  logo: string;
-}
-
 const Testimonial: React.FC = () => {
   const [videoPlaying, setVideoPlaying] = useState<boolean>(false);
-
-  const clients: Client[] = [
-    { name: "Lafarge", logo: "/lafarge-logo.png" },
-    { name: "Access", logo: "/diamond-logo.png" },
-    { name: "Lagos State Government", logo: "/circular-logo.png" },
-    { name: "Pepsi", logo: "/pepsi-logo.png" },
-    { name: "Champion", logo: "/champion-logo.png" },
-    { name: "TotalEnergies", logo: "/total-energies-logo.png" },
-  ];
 
   return (
     <div className="bg-black text-white">
@@ -88,41 +72,6 @@ const Testimonial: React.FC = () => {
                 </div>
               </div>
             </motion.div>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Clients section */}
-      <div className="py-8">
-        <div className="container mx-auto px-4">
-          <h3 className="text-gray-400 text-sm mb-6 hover:text-white transition duration-300">
-            Others weve worked for:
-          </h3>
-          <motion.div
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-          >
-            {clients.map((client, index) => (
-              <motion.div
-                key={index}
-                className="flex items-center justify-center p-2 transform hover:scale-105 transition duration-300"
-                variants={fadeInUp}
-                custom={index}
-              >
-                <div className="w-full h-16 relative">
-                  <Image
-                    src={client.logo}
-                    alt={`${client.name} logo`}
-                    fill
-                    className="object-contain"
-                    priority={index < 3} // prioritize first few logos
-                  />
-                </div>
-              </motion.div>
-            ))}
           </motion.div>
         </div>
       </div>

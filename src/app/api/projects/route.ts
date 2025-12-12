@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Project from "@/app/models/Project";
+import { mockJobs } from "@/mocks/mockJobs"; // <-- your mock dataset
 
 export async function GET() {
   try {
@@ -16,7 +17,11 @@ export async function GET() {
 
     console.error("GET /projects error:", message);
 
-    return NextResponse.json({ success: false, message }, { status: 500 });
+    // Fallback to mock data
+    return NextResponse.json(
+      { success: true, data: mockJobs, message: "Using mock data" },
+      { status: 200 }
+    );
   }
 }
 

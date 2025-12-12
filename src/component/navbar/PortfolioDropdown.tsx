@@ -14,8 +14,8 @@ export default function ConsultingDropdown({
 }: ConsultingDropdownProps) {
   const items = [
     {
-      name: "Strategy Consulting",
-      href: "/consulting/strategy",
+      name: "Business Prototypes",
+      href: "/bizPT",
       desc: "Guiding businesses through competitive strategy and growth planning.",
     },
     {
