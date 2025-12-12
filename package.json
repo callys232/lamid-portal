@@ -10,6 +10,7 @@
     "seed": "ts-node scripts/seedClient.ts"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@prisma/client": "^7.1.0",
     "@tanstack/react-query": "^5.90.8",
     "aos": "^2.3.4",

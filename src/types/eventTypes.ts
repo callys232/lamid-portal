@@ -11,4 +11,20 @@ export interface EventItem {
   date?: string;
   time?: string;
   location?: string;
+  category?: string;
+  eventTitle?: string;
+}
+
+export interface EventModalProps {
+  event: EventItem;
+  isOpen: boolean;
+  onClose: () => void;
+  primaryAction?: {
+    label: string;
+    onClick: () => void;
+  };
+  secondaryAction?: {
+    label: string;
+    onClick: () => void;
+  };
 }

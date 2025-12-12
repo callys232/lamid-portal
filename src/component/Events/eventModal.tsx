@@ -4,7 +4,6 @@ import { useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import type { EventItem } from "@/types/eventTypes";
-import EventSignupForm from "@/forms/eventSignUp";
 
 interface EventModalProps {
   event: EventItem;
@@ -18,7 +17,6 @@ export default function EventModal({
   onClose,
 }: EventModalProps) {
   const [currentImage, setCurrentImage] = useState(0);
-  const [showSignup, setShowSignup] = useState(false);
 
   const images = (
     Array.isArray(event.images)
@@ -36,11 +34,11 @@ export default function EventModal({
           exit={{ opacity: 0 }}
         >
           <motion.div
-            className="bg-black border border-orange-500 rounded-t-2xl shadow-2xl p-8 max-w-4xl w-full text-white relative overflow-y-auto max-h-[90vh]"
-            initial={{ y: "100%", opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: "100%", opacity: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="bg-black border border-orange-500 rounded-2xl shadow-2xl p-8 max-w-4xl w-full text-white relative overflow-y-auto max-h-[90vh]"
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            transition={{ duration: 0.3 }}
             role="dialog"
             aria-modal="true"
           >
@@ -64,7 +62,6 @@ export default function EventModal({
                   className="w-full h-full object-cover"
                   loading="lazy"
                 />
-
                 {images.length > 1 && (
                   <>
                     <button
@@ -77,7 +74,6 @@ export default function EventModal({
                     >
                       ‹
                     </button>
-
                     <button
                       onClick={() =>
                         setCurrentImage((p) =>
@@ -94,16 +90,12 @@ export default function EventModal({
             )}
 
             {/* Title + meta */}
-            <h2 className="text-3xl font-extrabold mb-2 bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold mb-2 text-orange-500">
               {event.title}
             </h2>
-
-            {event.date && (
-              <p className="text-sm text-gray-300 mb-1">
-                {event.date} {event.time && `— ${event.time}`}
-              </p>
-            )}
-
+            <p className="text-sm text-gray-300 mb-1">
+              {event.date} {event.time && `— ${event.time}`}
+            </p>
             {event.location && (
               <p className="text-sm text-gray-400 mb-4">{event.location}</p>
             )}
@@ -117,39 +109,15 @@ export default function EventModal({
 
             <hr className="border-t border-orange-500/40 my-6" />
 
-            {/* Buttons */}
-            {!showSignup && (
-              <div className="flex gap-4">
-                <button
-                  onClick={() => setShowSignup(true)}
-                  className="px-5 py-2 rounded-md font-semibold bg-orange-500 hover:bg-[#c21219] text-white transition"
-                >
-                  Sign Up for This Event
-                </button>
-
-                <button
-                  onClick={onClose}
-                  className="px-5 py-2 rounded-md font-semibold border border-orange-500 text-orange-500 hover:text-white hover:bg-orange-500 transition"
-                >
-                  All Events
-                </button>
-              </div>
-            )}
-
-            {/* Signup Form */}
-            {showSignup && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-6"
-              >
-                <EventSignupForm
-                  eventId={event.id}
-                  eventTitle={event.title}
-                  onSuccess={onClose}
-                />
-              </motion.div>
-            )}
+            {/* Action buttons */}
+            <div className="flex gap-4">
+              <button className="px-5 py-2 rounded-md font-semibold bg-orange-500 hover:bg-[#c21219] text-white transition">
+                Register
+              </button>
+              <button className="px-5 py-2 rounded-md font-semibold border border-orange-500 text-orange-500 hover:text-white hover:bg-orange-500 transition">
+                Learn More
+              </button>
+            </div>
           </motion.div>
         </motion.div>
       )}
@@ -158,7 +126,6 @@ export default function EventModal({
 }
 
 /* -------------------- Helper Components -------------------- */
-
 function Section({
   title,
   children,
@@ -168,9 +135,7 @@ function Section({
 }) {
   return (
     <div className="mb-6">
-      <h3 className="text-lg font-semibold bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text text-transparent mb-2">
-        {title}
-      </h3>
+      <h3 className="text-lg font-semibold text-[#c21219] mb-2">{title}</h3>
       {children}
     </div>
   );

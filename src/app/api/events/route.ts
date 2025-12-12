@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { mockEvents } from "@/mocks/mockEvents";
 
-// Example: Replace with your DB client (Prisma, Mongo, etc.)
+// Replace with your DB client (Prisma, Mongo, etc.)
 export async function GET() {
   try {
     // Example DB fetch (replace with your ORM/driver)

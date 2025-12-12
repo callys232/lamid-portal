@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import EventCard from "./eventCard";
-import EventModal from "./eventsModal";
+import EventModal from "./eventModal";
 import type { EventItem } from "@/types/eventTypes";
 import { useRouter } from "next/navigation";
 import { mockEvents } from "@/mocks/mockEvents";
@@ -59,7 +59,7 @@ const EventSummary: React.FC = () => {
                 {pageEvents.map((event) => (
                   <EventCard
                     key={event.id}
-                    {...event}
+                    event={event}
                     onClick={() => setSelectedEvent(event)}
                   />
                 ))}
@@ -88,7 +88,7 @@ const EventSummary: React.FC = () => {
       {/* Modal */}
       {selectedEvent && (
         <EventModal
-          {...selectedEvent}
+          event={selectedEvent}
           isOpen={!!selectedEvent}
           onClose={() => setSelectedEvent(null)}
           primaryAction={{

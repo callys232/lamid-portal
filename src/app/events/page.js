@@ -1,18 +1,16 @@
 import EventsHeader from "@/component/Events/eventsHeader";
-import EventSummary from "@/component/Events/eventsSummary";
-import HcdEvent from "../../component/Humancapital/hcdEvents";
 import BusinessPrototypes from "@/component/bizPrototypes/bizPrototypes";
 import Testimonial from "@/component/Testimonial";
 import Slider from "../../component/slider";
+import EventList from "@/component/Events/EventsList";
+import Allevents from "@/component/Events/allEvents";
 
 export default async function EventsPage() {
   return (
     <main>
       <EventsHeader />
-
-      <EventSummary />
-
-      <HcdEvent />
+      <Allevents />
+      <EventList />
       <BusinessPrototypes />
       <Testimonial />
       <Slider />

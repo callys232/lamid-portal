@@ -6,7 +6,7 @@ import { User } from "@/types/user";
 import FormInput from "./formInput";
 import FormSelect from "./formSelect";
 import FormTextarea from "./formTextarea";
-import FormFileUpload from "./formFileupload";
+import FormFileUpload from "./formFileUpload";
 import ProgressBar from "./progressBar";
 
 export interface RecruitmentFormProps {

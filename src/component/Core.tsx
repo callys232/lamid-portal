@@ -27,13 +27,13 @@ const services: Service[] = [
   },
   {
     name: "Sustainable Development",
-    href: "/services/sustainable-development",
+    href: "/sustainable",
     color: "bg-green-600",
     logo: "/sustainable-logo.png",
   },
   {
     name: "LAMID Hybrid Consultancy",
-    href: "/services/lamid-hybrid-consultancy",
+    href: "/jobs",
     color: "bg-purple-600",
     logo: "/hybrid-logo.png",
   },
