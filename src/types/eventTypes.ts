@@ -28,3 +28,10 @@ export interface EventModalProps {
     onClick: () => void;
   };
 }
+export interface Review {
+  id: number;
+  name: string;
+  rating: number;
+  comment: string;
+  uploadedAt: string;
+}
