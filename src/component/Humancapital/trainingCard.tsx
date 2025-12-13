@@ -27,8 +27,8 @@ export default function TrainingCard() {
 
       <div className="flex-1 flex flex-col justify-center">
         <p className="text-sm md:text-base text-gray-200 mb-4 leading-relaxed">
-          We light up your team and remodel their mindset and strategies to
-          succeed beyond the 21st century.
+          Empowering organizations through strategic hiring, tailored
+          development, and globally competitive team building.
         </p>
         <button
           className="px-4 py-2 text-sm rounded-md border border-orange-500 text-orange-400 

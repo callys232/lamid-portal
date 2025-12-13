@@ -13,6 +13,7 @@ export default function ProfileSidebar({
     { key: "teams", label: "Teams" },
     { key: "notifications", label: "Notifications" },
     { key: "escrow", label: "Escrow" },
+    // { key: "Project", label: "projectEscrow" },
   ];
 
   return (

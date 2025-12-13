@@ -50,10 +50,8 @@ const CoreServiceCard: FC<CoreServiceCardProps> = ({
           />
         )}
 
-        {/* Overlay to darken image */}
         {hovered && <div className="absolute inset-0 bg-black/50 z-10"></div>}
 
-        {/* Content above */}
         <div className="relative z-20 text-center">
           <Image
             src={icon}

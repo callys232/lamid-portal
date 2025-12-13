@@ -50,7 +50,7 @@ const VMO = () => {
           </Link>
 
           {/* Mission Section */}
-          <Link href="/mission">
+          <Link href="/portfolio">
             <div className="flex flex-col bg-black border border-gray-800 rounded-lg p-6 transition-all duration-300 hover:border-blue-500 hover:scale-105 hover:shadow-lg cursor-pointer space-y-4">
               <div className="text-center">
                 <div className="bg-blue-600 text-white font-bold py-2 px-4 rounded-md inline-block hover:bg-blue-500 transition duration-300">

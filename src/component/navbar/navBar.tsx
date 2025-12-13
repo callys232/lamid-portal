@@ -29,6 +29,7 @@ const navItems = [
     DropdownComponent: ConsultingDropdown,
   },
   { name: "TALENT CLUB", href: "/talent" },
+  { name: "EVENTS", href: "/events" },
   { name: "CONTACT US", href: "/contact" },
 ];
 

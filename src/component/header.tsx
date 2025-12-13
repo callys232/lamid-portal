@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Typewriter } from "react-simple-typewriter";
 import { motion } from "framer-motion";
 import Head from "next/head";
+import Link from "next/link";
 
 export default function HeroSection() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -45,7 +46,7 @@ export default function HeroSection() {
       "Find world-class consultants, experts, advisors, and job opportunities. Build and grow your organization with ease.",
     potentialAction: {
       "@type": "SearchAction",
-      target: "https://yourdomain.com/search?q={query}",
+      target: "https://lamidconsulting.com/search?q={query}",
       "query-input": "required name=query",
     },
   };
@@ -137,15 +138,28 @@ export default function HeroSection() {
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
             className="mt-6 flex justify-center gap-6 flex-wrap"
           >
-            <button className="text-white text-lg hover:text-[#c12129] transition">
-              Find Jobs
-            </button>
-            <button className="text-white text-lg hover:text-[#c12129] transition">
-              Post Jobs
-            </button>
-            <button className="bg-[#c12129] px-6 py-3 rounded-xl text-white text-lg hover:bg-[#a11e25] transition">
-              Seek a Consultant
-            </button>
+            <div className="flex gap-4">
+              <Link
+                href="/jobs"
+                className="text-white text-lg hover:text-[#c12129] transition"
+              >
+                Find Jobs
+              </Link>
+
+              <Link
+                href="/postjobs"
+                className="text-white text-lg hover:text-[#c12129] transition"
+              >
+                Post Jobs
+              </Link>
+
+              <Link
+                href="/consultants"
+                className="bg-[#c12129] px-6 py-3 rounded-xl text-white text-lg hover:bg-[#a11e25] transition"
+              >
+                Seek a Consultant
+              </Link>
+            </div>
           </motion.div>
         </div>
       </header>

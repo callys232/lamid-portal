@@ -38,6 +38,7 @@ export default function Job({
   const [activeCategory, setActiveCategory] = useState("All");
   const [allEntities, setAllEntities] = useState<Project[]>([]);
   const [selected, setSelected] = useState<Project | null>(null);
+  const [loading, setLoading] = useState(true);
 
   // ✅ Fetch jobs from API or fallback to mock data
   useEffect(() => {
@@ -49,6 +50,8 @@ export default function Job({
       } catch (err) {
         console.error("Backend fetch failed, using mock data:", err);
         setAllEntities(mockJobs);
+      } finally {
+        setLoading(false);
       }
     };
     fetchEntities();
@@ -89,12 +92,20 @@ export default function Job({
         label="Filter jobs"
       />
 
-      {/* Carousel */}
-      <JobCarousel
-        title="Open for bidding"
-        jobs={filtered}
-        onSelect={setSelected}
-      />
+      {/* Loading / Empty State */}
+      {loading ? (
+        <p className="text-gray-400 mt-4">Loading jobs...</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-gray-400 mt-4">
+          No jobs available in this category.
+        </p>
+      ) : (
+        <JobCarousel
+          title="Open for bidding"
+          jobs={filtered}
+          onSelect={setSelected}
+        />
+      )}
 
       {/* Modal */}
       {selected && (

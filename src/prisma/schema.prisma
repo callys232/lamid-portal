@@ -1,0 +1,30 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model TalentClubApplication {
+  id              String   @id @default(cuid())
+  fullName        String   // entry.111111111
+  email           String   // entry.222222222
+  phone           String?  // entry.333333333
+  country         String   // entry.444444444
+  linkedin        String   // entry.555555555
+  currentRole     String   // entry.666666666
+  yearsExperience String   // entry.777777777
+  industry        String   // entry.888888888
+  modeOfWork      String   // entry.999999999
+  dietary         String?  // entry.101010101
+  accessibility   String?  // entry.121212121
+  consent         String   // entry.141414141
+  comments        String?  // entry.151515151
+  motivation      String   // entry.191919191
+  cvUrl           String?  // cloudinary file
+
+  createdAt       DateTime @default(now())
+}

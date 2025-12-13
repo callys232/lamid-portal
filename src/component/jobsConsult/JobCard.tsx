@@ -12,7 +12,7 @@ interface JobCardProps {
 export default function JobCard({ job, onClick, isActive }: JobCardProps) {
   return (
     <div
-      className={`bg-white/10 backdrop-blur-sm border rounded-xl p-4 text-gray-100 shadow-md transition-all duration-200 cursor-pointer
+      className={`bg-black/10 backdrop-blur-sm border rounded-xl p-4 text-gray-100 shadow-md transition-all duration-200 cursor-pointer
         ${
           isActive
             ? "border-[#c21219] shadow-lg ring-2 ring-[#c21219]"
