@@ -1,17 +1,8 @@
 import React from "react";
-
-interface Transaction {
-  id: string;
-  date: string;
-  projectTitle: string;
-  type: string;
-  amount: number;
-  status: string;
-  action: string;
-}
+import { EscrowTransaction } from "@/types/project";
 
 interface EscrowTableProps {
-  transactions: Transaction[];
+  transactions: EscrowTransaction[];
 }
 
 const EscrowTable: React.FC<EscrowTableProps> = ({ transactions }) => (
@@ -19,8 +10,8 @@ const EscrowTable: React.FC<EscrowTableProps> = ({ transactions }) => (
     <thead>
       <tr>
         <th>Date</th>
-        <th>Project</th>
-        <th>Type</th>
+        <th>Project ID</th>
+        <th>Milestone</th>
         <th>Amount</th>
         <th>Status</th>
         <th>Action</th>
@@ -29,14 +20,14 @@ const EscrowTable: React.FC<EscrowTableProps> = ({ transactions }) => (
     <tbody>
       {transactions.map((tx) => (
         <tr key={tx.id}>
-          <td>{tx.date}</td>
-          <td>{tx.projectTitle}</td>
-          <td>{tx.type}</td>
+          <td>{tx.date ?? tx.createdAt}</td>
+          <td>{tx.projectId}</td>
+          <td>{tx.milestoneId ?? "-"}</td>
           <td>${tx.amount}</td>
           <td>{tx.status}</td>
           <td>
             <button className="text-blue-500 hover:underline">
-              {tx.action}
+              {tx.action ?? "View"}
             </button>
           </td>
         </tr>

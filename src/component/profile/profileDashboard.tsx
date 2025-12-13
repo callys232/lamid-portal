@@ -11,7 +11,8 @@ import Notifications from "./tabs/Notifications";
 import Escrow from "./escrow/Escrow";
 import { Project } from "@/types/project";
 import { teamProjects, individualProjects } from "@/mocks/mockClient";
-import { SkeletonLoader } from "@/component/SkeletonLoader"; // ✅ default import
+import { SkeletonLoader } from "@/component/SkeletonLoader";
+import ProjectEscrow from "../Escrow/Dashboard";
 
 export default function ProfileDashboard({
   params,
@@ -77,6 +78,8 @@ export default function ProfileDashboard({
         return <Notifications />;
       case "escrow":
         return <Escrow />;
+      // case "Project":
+      //   return <ProjectEscrow />;
       default:
         return projectId ? (
           <Overview projectId={projectId} />

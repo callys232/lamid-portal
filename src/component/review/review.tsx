@@ -88,7 +88,7 @@ export default function ReviewSection() {
   );
 
   return (
-    <div className="bg-white border border-[#c21219] rounded-lg shadow-lg p-6 space-y-6">
+    <div className="bg-white/50 border border-[#c21219] rounded-lg shadow-lg p-6 space-y-6">
       <h2 className="text-2xl font-bold text-[#c21219] border-b border-[#c21219] pb-2">
         Client Reviews
       </h2>
@@ -118,7 +118,7 @@ export default function ReviewSection() {
             aria-label="ratings"
             value={rating}
             onChange={(e) => setRating(Number(e.target.value))}
-            className="w-full px-3 py-2 rounded-md border border-[#c21219] focus:ring-2 focus:ring-[#c21219]"
+            className="w-full hover:bg-black px-3 py-2 rounded-md border border-[#c21219] focus:ring-2 focus:ring-[#c21219]"
           >
             {[5, 4, 3, 2, 1].map((r) => (
               <option key={r} value={r}>

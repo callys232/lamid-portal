@@ -1,42 +1,45 @@
 import { Consultant } from "./client";
 
+/* -------------------- PROJECT -------------------- */
 export interface Project {
   _id?: string; // DB id
-  id?: string; // Client id
+  id: string; // Client id
 
   title: string;
   category: string;
   tech?: string;
   location?: string;
-  budget?: string;
-  hourlyRate?: string;
+  budget?: number; // numeric for calculations
+  hourlyRate?: number; // numeric for calculations
   rating?: number;
   organization?: string;
   image?: string;
-  images?: string;
+  images?: string[];
   description?: string;
   milestones?: Milestone[];
+  // type?: "fixed" | "hourly";
+  type?: number;
+  adminIds?: string[];
+  currentMilestoneId?: string;
   suggestedBidRange?: {
     min: number;
     max: number;
   };
 
-  // ✅ Strongly typed consultants
   consultants?: string[] | Consultant[];
 
   priority?: string;
   deadline?: string;
   status?: string;
 
-  // ✅ Optional ownership fields
   teamId?: string;
   ownerId?: string;
 
-  // ✅ UI field
   milestoneProgress?: number;
   timeline?: string;
   skills?: string[];
   escrow?: EscrowTransaction[];
+  activities?: ActivityItem[];
 }
 
 /* -------------------- MILESTONES -------------------- */
@@ -50,8 +53,8 @@ export type MilestoneStatus =
   | "disputed";
 
 export interface Milestone {
-  id?: string;
   _id?: string;
+  id?: string;
   title: string;
   description?: string;
   amount?: number;
@@ -61,24 +64,81 @@ export interface Milestone {
   deadline?: string;
 }
 
+/* -------------------- ACTIVITY LOG -------------------- */
 export interface ActivityItem {
   id: string; // unique identifier
   action: string; // e.g. "Bid Placed", "Milestone Updated"
   user: string; // who performed the action
   timestamp: string; // ISO date string
   details?: string; // optional extra info
+  type?: "system" | "user";
 }
+
 /* -------------------- ESCROW -------------------- */
+export type EscrowStatus = "pending" | "funded" | "released" | "failed";
+
 export interface EscrowTransaction {
   id: string;
   projectId: string;
   milestoneId?: string;
   amount: number;
   currency: string;
-  status: string;
+  status: EscrowStatus;
   createdAt: string;
   updatedAt: string;
   date?: string;
-  type?: string;
-  action?: string;
+  // type?: string;
+  action?: string; // descriptive action
+}
+
+/* -------------------- WALLET -------------------- */
+export interface Wallet {
+  id: string;
+  userId: string;
+  currency: string;
+  availableBalance: number;
+  heldBalance: number;
+  status: "active" | "frozen" | "closed";
+  updatedAt: string;
+}
+
+/* -------------------- LEDGER -------------------- */
+export interface LedgerEntry {
+  id: string;
+  userId: string;
+  projectId?: string;
+  currency: string;
+  amount: number;
+  debitAccount: string;
+  creditAccount: string;
+  referenceId?: string;
+  createdAt: string;
+}
+
+/* -------------------- DISPUTES -------------------- */
+export type DisputeStatus = "open" | "under_review" | "resolved" | "closed";
+
+export interface Dispute {
+  id: string;
+  projectId: string;
+  milestoneId?: string;
+  openedBy: string;
+  status: DisputeStatus;
+  resolution?: "refund" | "release" | "split";
+  resolutionRatio?: number; // e.g. 0.5 for 50/50 split
+  evidenceRefs?: string[];
+  notes?: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+// types/project.ts
+export interface EscrowDashboardProps {
+  balance: number;
+  fundedTotal: number;
+  releasedTotal: number;
+  transactions: EscrowTransaction[];
+  ledger: LedgerEntry[];
+  project: Project;
+  currentUserId: string;
 }

@@ -276,7 +276,7 @@ export default function JobModal({
 }
 
 /* -------------------- Helper Components -------------------- */
-function Metric({ label, value }: { label: string; value: string }) {
+function Metric({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="px-5 py-4 bg-white/10 border border-white/20 rounded-xl shadow-md">
       <p className="font-semibold text-[#c21219] text-lg">{value}</p>
