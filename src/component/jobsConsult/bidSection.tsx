@@ -13,6 +13,7 @@ interface BidSectionProps {
   isRegisteredUser: boolean;
   onBid: (job: Project, amount: number) => void;
   initialBids?: Bid[];
+  onLatestBidChange?: (amount: number | null) => void;
 }
 
 export default function BidSection({
@@ -20,12 +21,14 @@ export default function BidSection({
   isRegisteredUser,
   onBid,
   initialBids = [],
+  onLatestBidChange,
 }: BidSectionProps) {
   const [bidAmount, setBidAmount] = useState<number | "">("");
   const [bids, setBids] = useState<Bid[]>(initialBids);
 
   const handleBid = () => {
     if (!isRegisteredUser) return;
+
     if (typeof bidAmount === "number" && bidAmount > 0) {
       if (
         job.suggestedBidRange &&
@@ -36,17 +39,29 @@ export default function BidSection({
           `⚠️ Your bid is outside the suggested range (${job.suggestedBidRange.min}–${job.suggestedBidRange.max}).`
         );
       }
+
       onBid(job, bidAmount);
-      setBids((prev) => [
-        ...prev,
-        { amount: bidAmount, date: new Date().toLocaleString() },
-      ]);
+
+      const newBid: Bid = {
+        amount: bidAmount,
+        date: new Date().toLocaleString(),
+      };
+
+      setBids((prev) => {
+        const updated = [...prev, newBid];
+        // ✅ notify parent of latest bid
+        if (onLatestBidChange) {
+          onLatestBidChange(newBid.amount);
+        }
+        return updated;
+      });
+
       setBidAmount("");
     }
   };
 
   return (
-    <div className="mt-6">
+    <div className="mt-4">
       {/* Bid input */}
       <div className="flex items-center gap-3 mb-4">
         <input
